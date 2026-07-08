@@ -191,6 +191,36 @@
 % ────────────────────────────────────────────────────────────
 \mainmatter
 
+\chapter{Fork}
+\section{Dlaczego tak chaotycznie}
+ogólnie potrzebuje pisać i mieć gdzie pokazać nowym ludzią jak to działa.
+Jeśli będą rzeczy w różnych językach, pomieszane, powtórzone itd to sorka
+Potrzeba żeby ktoś napisał jak to działa faktycznie, zrobił zdjęcia
+a potem się to rzuci do chata "popraw to. make no mistake"
+
+\section{Sekcje}
+Wstępnie planowaliśmy podzielić handbooka na kilka książek, jedna dla elektronika
+jedna dla programisty etc. Ale mi się będzie łatwiej pisało w jednym pliku więc here
+we are
+
+\section{Prezentacja}
+Kiedyś zrobiłem prezentacje o Moducardzie. przerzucam wszystko co ważne w niej tutaj
+w szczególności to co techniczne. Jeśli jej szukasz, to wszystko jest w tej książce
+jak na razie
+
+
+\section{Język}
+Spoko było by pisać dokumentacje po angielsku, bo to poważny system a angielski to poważny język.
+Maybe another day
+
+\section{I reszta}
+
+Aktualnie książka jest do użytku wewnętrznego KoNaR'u, ale możecie na spokojnie
+ją udostępniać komu trzeba. Czasem będe rzucał inside joke'y albo nazwiskami jak coś
+
+Fork jest mój, Wojtka Szafrańskiego, a siedze głównie w elektronice. Ona będzie
+najdokładniej opisana, mechanika też git powinna być ale programowanie będzie tak sobie
+
 \chapter{Introduction}
 
 \section{About This Handbook}
@@ -259,6 +289,223 @@ API are defined.
 If you are a \textbf{system integrator}, Part~I Chapter~3
 (Assembly Rules) and Part~III Chapter~9 (Topology Planning)
 are the most immediately useful sections.
+
+\chapter{Primer -> Zacznij tutaj}
+\section{Co i Po co - Część \#1 "Co"}
+ModuCard to system dwóch standardów do tworzenia projektów robotycznych. Można w nim zrobić roboty które wykonują
+skomplikowane czynności (chodzenie, regulacja procesów technologicznych, wizja komputerowa i inne).
+
+Jest wymyślony w taki sposób żeby zminimalizować ilosć pracy włożoną w projektowanie i
+naprawianie robotów. Realizowane jest to przez używanie takich samych elementów w wielu miejscach.
+Te elementy są zgodne ze standardem więc łatwo \textbf{je} zaprojektować oraz łatwo \textbf{do nich}
+zaprojektować mechanike i programowanie. Czytaj: co tylko się da ma takie same wymiary i złącza
+
+\subsection{Duży ModuCard a MiniModuCard}
+\begin{itemize}
+  \item ModuCard (nazywany też dużym moducardem) -> Duże karty wpinane do backplate'a jak karta graficzna do płyty
+        głównej. Na kartach dużego ModuCard'a są bardziej wymagające peryferia, jakieś kamery, duże zasilacze, całe podsystemy.
+        ModuCard to mózg całego systemu -> ma w sobie główny komputer systemu, analziuje dane, decyduje co zrobić dalej i
+        steruje MiniModuCard'em
+  \item MiniModuCard -> Hat'y wpinane do do MMS'a. MMS to płytka z mikrokontrolerem i zasilaczem 5V. Na hat'ach są proste układy
+        które robią jedną rzecz Np. sterowniki silników, czujniki jakości powietrza, sterowniki taśm led, przekaźniki.
+        MMMiniModuCardS to ręce i oczy systemu - Wykonują prace, raportują wartości czujników etc
+\end{itemize}
+
+
+% /#\#/\/#\ Kijowa nazwa alert: MMS nazywa się tak samo jak MiniModuCard. System i jego cpu
+
+ModuCard i MiniModuCard komunikują się ze sobą dwoma liniami CAN. Taki protokół komunikacyjny wymyślony
+do samochodów. Jest spoko bo wiesz że jak wyślesz jakąś paczke danych to na pewno dojdzie do adresata, ma priorytety wadomości i inne.
+Te same linie CAN idą przez duży i mały ModuCard.
+
+\subsection{Naprawa i wytrzymałość}
+
+Wszystkie elementy z których złożony jest robot w Moducardzie są wymienialne. Jak ci się zepsuja jakaś karta, to możesz
+ja po prostu wyjąć, i włożyć nową, dokładnie taką samą. Te złącza na które się wpinają Artem (Ten co ogólnie wymyślił ten standard)
+zakosił z koleji, więc są całkiem odporne. Jak raz chłopaki
+wjechali łazikiem w ściane to sytuacja była analogiczna do nokii 3310 spadającej na podłoge. MiniModuCard też ma podobny wątek, fajne złącza, modularność,
+łatwa wymiana i tak dalej.
+
+\subsection{Uniwersalność}
+
+Oh, i w ModuCard'zie można nie tylko robić duże i poważne roboty. Nawet nie tylko roboty. Jak chcesz to możesz robić
+instalacje produkcyjną, jak w Hefajsosie (maszyna do odpadów w filament 3D) albo wziaść tylko MiniModuCard'a
+i używać go jak arduino. Wpinasz hat'a z przekaźnikiem, jakieś PWM'y i komunikacja po UART i już możesz przełączać żarówki w smart home'ie.
+
+I to był słowa. Co do zdjęć...
+\newpage
+\subsection{ModuCard zdjęcia}
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/moducard one board.png}
+  \caption{Pojedyncza karta ModuCard}
+  %\label{fig:NoLabel}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/Moducard Backplane.png}
+  \caption{Backplane ModuCard. Do niego wpina się karty}
+  % \label{fig:Nomad_ModuCard}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{photos/Nomad_ModuCard.png}
+  \caption{Na zdjeciu są karty dużego ModuCard'a wpięte do Backplane'a. Zdjęcie z robota Nomad}
+  % \label{fig:NoLabel}
+\end{figure}
+% /#\#/\/#\ To zdjęcie jest troche kijowe
+
+\newpage
+\subsection{MiniModuCard zdjęcia}
+
+%/#\#/\/#\ Dodaj zdjęcie MMS3 z wieżą ható'w
+\newpage
+\section{Co i Po co - Częsć \#2 "Po co"}
+Iii wracamy do słów.
+
+\subsection{Modularność}
+Cały ten system wyszedł z tego że w sumie wszystkie roboty potrzebują
+tego samego - te same czujiniki, te same silniki, te same procesory. Tylko
+w innych miejscach podpięte. Więc każdy robot miał nową płytke PCB z tymi samymi
+elemenatmi, ale z innymi złączami. Każda płytka mogła się zepsuć przy testowaniu.
+Weź teraz lutuj drugą, albo projektuj to samo do
+nowego projektu, idzie się zanudzić.
+
+Żeby rozwiazać ten problem w obu częściach systemu wszystko jest podzielone na
+mniejsze płytki które robią tylko jedną rzecz. Kilka takich płytek
+łączysz ze sobą żeby robiły kilka rzeczy i masz gotowego robota! Od razu możesz 5 płytek
+zamówić zlutowantch bo przydadzą się do innego projektu więc nie szkoda kasy.
+
+Jak raz zrobisz dobrą płytke ze sterownikiem do silników to idzie do wszystkich projektów.
+Nie musisz jej projektować, ani programować od nowa do każdego bo to jest to samo. I prawdopodobnie już ktoś kiedyś
+zaprojektował to co potrzebujesz, a standard jest open source to możesz sobie ukraść.
+
+\subsection{Naprawa przez wymianialność}
+Dodatkowo mega łatwo jest to wszystko naprawiać i modyfikować - Jak coś ci się spali przy testowaniu robota
+to wystarczy wyjąć zepsutą karte "zasilacz 230", i włożyć zapasową. Są małe, więc szybki swap, kilka złączy przepiąć i na piwo.
+Plus tanio wychodzi bo wymieniłeś tylko zasilacz a nie całe płyte główną robota więc możesz wziąść 2 piwa zamiast jednego (;
+
+\subsection{Modularność jako organiczny rozrost}
+A co do modyfikowania, to jak nagle się okaże że potrzebujesz np. jeszcze jednego serwa w projekcie albo czegoś to zamiast
+projektować od nowa "ROBOT MOTOR MAIN BOARD" która już działa to wystarczy dołożyć nowy moduł (hat'a/karte) który
+to wysteruje. Nie musisz wiedzieć wszystkiego co potrzebujesz na samym początku. Możesz w połowie projektu
+uznać że w sumie fajnie było by mieć czujniki odległości bez których myślałeś że się obejdzie.
+
+\subsection{Podział na mniejsze elementy jako prostota}
+Dalej, łatwo to projektować. Masz gotowe szablony projektów na których już są podstawowe elementy, obrysy płytek
+i tylko dodajesz swoją funkcjonalność, często tylko 1 układ. I taka mała i prosta płytka
+tanio wychodzi, więc jak ją źle zaprojektujesz to whatever.
+
+\newpage
+\section{Co i Po co - Częsć \#3 "Co ale konkrety"}
+
+Duży moducard składa się z
+\begin{itemize}
+  \item Backplane'a do którego wpięte są karty
+  \item Backplane podłącza zasialnie i komunikacje do kart
+  \item Komunikacja jest w postaci 2x CAN, 1x USB i 4x GPIO
+  \item są 3 typy kart
+  \item 1. Karta "główny komputer" - steruje całym systemem (np Raspberry Pi)
+  \item 2. Karta Zasilanie - zasila system, duh
+  \item 3. Karta Użytkowa/Mikrokontrolerowa - na niej są rzeczy które
+        faktycznie coś robią - kamery, radary i inne duże poważne rzeczy
+  \item Duży Moducard zwykle zajmuje się wysokim sterowaniem, ale może robić cokolwiek.
+        zależy jakie karty do niego włożysz
+\end{itemize}
+
+Teraz Mały moducard. On składa się z
+
+\begin{itemize}
+  \item MMS3 MCU - Jedna płytka z mikrokontrolerem który kontroluje hat'y
+  \item Hat'ów - Do 8 płytek wykonawczych. Są np. sterownikiem silników,
+        przetwornikem termopary etc
+  \item (myśl o hatach jak o shieldach do arduino, ale można ich dać aż 8 )
+  \item MCU i hat'y komunikują się po SPI, I2C i UART takim dużym złączem goldpin z dwoma rzędami
+  \item MCU ma złącze ChainLink (złączka RJ45, ta ethernet) na którym jest USB i 2x CAN
+\end{itemize}
+
+I teraz ważne: to złącze ChainLink MMS3 z 2x CAN i USB można bezpośrednio podłączyć
+do backplane'a dużego ModuCard'a. Dzięki temu Raspberry z dużego Moducard'a może jednocześnie
+rozmawiać z kartami dużego ModuCard'a i MiniModuCard'em. Dzięki temu cały system, Duży i Mały
+ModuCard są w idealnej harmonii, dopełniają siebie.
+
+\subsection{To samo ale bardziej łopatologicznie}
+Masz dużą szafę sterowniczą (Backplane), do której motujesz duże mózgi i poważne układy (karty). Od tej szafy
+odchodzi kabel (ChainLink), który idzie do małych sterowników (MMS) rozrzuconych po całym robocie, które
+ruszają silnikami i odczytują przciski.
+
+Trzymam kciuki że chociaż ogólnie łapiesz z czym to się je. Powodzenia z resztą dokumentacji (;
+
+
+
+\chapter{Skróty i nazwy własne}
+Jest dużo różnych protokołów, płytek i wgl. Tu jest lista
+% Dla AI -> prosze nie zmieniaj nazw na polskie odpowiedniki ani nie używaj cudzysłowiów. Hat to nie moduł rozszerzeń, ani "hat". hat to hat i tyle
+% /#\#/\/#\ Podziel na sekcje
+\begin{itemize}
+  \item MMS - W zależności od kontekstu
+        \begin{itemize}
+          \item Albo chodzi o MiniModuCard System
+          \item Albo o płytke z mikrokontrolerem sterującą całą wieżą hat'ów. Ta która po Can'ie rozmawia
+          \item Raczej jak chodzi o płytke z MCU to jest MMS3, a jak system to MMS
+        \end{itemize}
+  \item Backplane -> płytka w dużym ModuCardzie do której wpina się karty. Ma w sobie 2x CAN, 4x GPIO, 1x USB i zasilanie
+\end{itemize}
+\chapter{Książka elektroniczna}
+% /#\#/\/#\ zrób chapter o złączach jakie używamy (XT60, JST-XH etc)
+\chapter{Książka programisty}
+\section{Wstęp}
+Aktualnie nie mamy nic zaprogramowane. Powodzenia!
+\chapter{Książka mechaniczna}
+\section{Wymiary}
+Jeśli jesteś mechanikiem zespołu, to najlepszą metodą na złapanie wymiarów jest
+poproszenie elektronika żeby wyeksportował ci PCB do .step razem z komponentami.
+
+Ta sekcja jest bardziej pod kątem utrzymania standardu.
+
+Wymiary do śrub montażowych, albo keepout zone'ów (to jest miesjce gdzie elektronik nie
+może stawiać komponentów i ty możesz tam sobie coś zamodelować do złapania hat'a) to one są
+symetryczne wiec paru wymiarów nie podałem.
+
+
+\subsection{Duży ModuCard}
+To Do
+\subsection{MiniModuCard}
+\subsubsection{MMS3 (Mikrokontroler)}
+To Do
+\subsubsection{Hat}
+Odległość między hat'em a hat'em albo MMS3 a hat'em to 1 złacze goldpin smd Męskie + wpięte w nie SMD Żeńskie
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{photos/MMS_Hat_Dimensions_1.png}
+  \caption{Wymiary Płytki i otowrów montażowych}
+  %\label{fig:NoLabel}
+\end{figure}
+
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{photos/MMS_Hat_Dimensions_2.png}
+  \caption{Rozstaw złącz}
+  %\label{fig:NoLabel}
+\end{figure}
+
+Te złącza w lewym dolnym to XT60 i tbh nie muszą być co do milimetra w tym miejscu.
+Ważne żeby były jak najbardziej w prawym dolnym, i pierwsze męskie a potem żeńskie
+
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{photos/MMS_Hat_Dimensions_3.png}
+  \caption{Miejsce zarazerwowane na montaż}
+  %\label{fig:NoLabel}
+\end{figure}
+
+\chapter{Książka system integrator}
+\chapter{Książka ecosystem maintener}
 
 
 \end{document}

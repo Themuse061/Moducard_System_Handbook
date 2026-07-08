@@ -1,3 +1,10 @@
+# Czemu fork
+ogólnie potrzebuje pisać i mieć gdzie pokazać nowym ludzią jak to działa.
+Jeśli będą rzeczy w różnych językach, pomieszane, powtórzone itd to sorka
+Potrzeba żeby ktoś napisał jak to działa faktycznie, zrobił zdjęcia
+a potem się to rzuci do chata "popraw to. make no mistake"
+
+
 # Moducard_System_Handbook
 Repo with source files for Moducard System Handbook
 
