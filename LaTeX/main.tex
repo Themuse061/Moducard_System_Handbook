@@ -20,6 +20,8 @@
   inner=22mm, outer=18mm,
   headheight=13pt
 ]{geometry}
+\usepackage{tabularx}
+\usepackage{float}
 
 % ── Colors ──────────────────────────────────────────────────
 \usepackage{xcolor}
@@ -212,6 +214,11 @@ jak na razie
 \section{Język}
 Spoko było by pisać dokumentacje po angielsku, bo to poważny system a angielski to poważny język.
 Maybe another day
+
+\section{struktua}
+Zacznij czytać od Primer'a, tam jest ogólny opis systemu. W rozdziałąch moducard - zasada działania
+masz troche więcej szczegółów, a potem w kolejnych rozdziałach masz już wszystkie szczegóły.
+Znowu to samo powtarzam w rozdziałach projektowanie kart/hatów. jak nie załapiesz to zapytaj się kogoś z koła
 
 \section{I reszta}
 
@@ -427,7 +434,7 @@ Teraz Mały moducard. On składa się z
   \item MCU ma złącze ChainLink (złączka RJ45, ta ethernet) na którym jest USB i 2x CAN
 \end{itemize}
 
-I teraz ważne: to złącze ChainLink MMS3 z 2x CAN i USB można bezpośrednio podłączyć
+I teraz ważne: to złącze ChainLink MMS3 z 2x CAN i USB można podłączyć
 do backplane'a dużego ModuCard'a. Dzięki temu Raspberry z dużego Moducard'a może jednocześnie
 rozmawiać z kartami dużego ModuCard'a i MiniModuCard'em. Dzięki temu cały system, Duży i Mały
 ModuCard są w idealnej harmonii, dopełniają siebie.
@@ -451,11 +458,621 @@ Jest dużo różnych protokołów, płytek i wgl. Tu jest lista
           \item Albo chodzi o MiniModuCard System
           \item Albo o płytke z mikrokontrolerem sterującą całą wieżą hat'ów. Ta która po Can'ie rozmawia
           \item Raczej jak chodzi o płytke z MCU to jest MMS3, a jak system to MMS
+          \item Często też pisze Kontroler MiniModuCard jako MMS3
+          \item Ogólnie nazwy są jeszcze płynne
         \end{itemize}
   \item Backplane -> płytka w dużym ModuCardzie do której wpina się karty. Ma w sobie 2x CAN, 4x GPIO, 1x USB i zasilanie
+  \item MMS Link, ChainLink -> połączenie między MMS3 a Backplane'em dużego ModuCard'a. Ma 2x Can, 1x USB, 12V stby
+  \item Chainbus
+  \item Karta ModuCard
+        \begin{itemize}
+          \item Karta CPU
+          \item Karta PSU
+          \item Karta Mikrokontrolerowa/Użytkowa
+        \end{itemize}
+  \item MCU - Mikrokontroler
+  \item wieża, drzewko MMS -> 1 lub więcej hat'ów połączonych z Kontrolerem MiniModuCard
+  \item Sznurek/gałąź MMS3 - kilka MMS3 podłaczonych ze sobą po ChainLink
 \end{itemize}
 \chapter{Książka elektroniczna}
 % /#\#/\/#\ zrób chapter o złączach jakie używamy (XT60, JST-XH etc)
+\section{MiniModuCard - zasada działania}
+\subsection{Overwiew}
+Jak masz dużego moducarda to każda kartka ma swój MCU, i gdybyś robił osobną karte
+na każdy feature (sterownik silnika, kontroler ledów) to wyszło by ci drogo, połowy
+kanałów byś nie użył i te wszystkie karty potrzebują dużo miejsca. + Pare innych problemów
+
+Więc zrobiliśmy mniejszy system, MiniModuCard. Bascially arduino do którego dopinasz
+shieldy ale można dużo tych shieldów dawać i sterować tym po CAN'ie który łączysz potem
+z ROS'em (Robot Operating System). Arduino w naszym wypadku to płytka kontroler, a shield
+to hat.
+
+\subsubsection{MiniModuCard - Hat}
+
+Na hat'ie zwykle masz 1-2 IC które coś robią np. sterownik krokówki. Wyjścia są wyprowadzone
+na złączki JST-XH na długiej krawędzi płytki, a wszystko co konfiguracyjne na krótką krawędź.
+Tanio i łatwo to zaprojektować. Niby mało, w jednym projekcie używasz kilku hat'ów
+np. możesz zrobić przysick włącz-wyłącz na hat'ie GPIO, dodać hat'a LED do wyświetlania statusu,
+hat protocol z konwerterem UART -> RS485 i już masz elektronike do sterowania falownikiem
+dla silnika 230V. Chcesz utrzymywać haty proste z jedną funkcjonalnością żeby łatwo było składać je ze sobą.
+
+Dalej, hat'y bardzo łatwo dodawać i odejmować z projektu więc możesz postawić połowe elektroniki na nogi,
+i dopiero potem zacząć projektować reszte. Nie musisz robić reworku softu od zera jak w normalnych projektach.
+Możesz wziąść na szybko hat'a z innej części projektu na testy zanim zamówisz więcej. Możesz zacząć projekt nie
+wiedziąc czego potrzebuejsz i na bierząco robić hat'y
+
+\subsubsection{MiniModuCard - Kontroler}
+
+MCU komunikuje się z hat'em po SPI, I2C, UART i może wybierać do którego hat'a się podłacza.
+Możesz myśleć o tym że wszystkie linie komunikacji są podłączone do każdego hat'a przez przekaźnik,
+więc możesz je kompletnie odłączyć (IRL jest bus switch zamiast przekaźnika) więc z punktu widzenia twojego
+hat'a masz swoje własne linie SPI i UART. Tylko jeśli na swoim hat'ie potrzebujesz więcej niż jedno SPI albo UART to
+musisz kombinować, np jak na hat'ie Protocol albo thermocouple.
+
+MCU zajmuje się kontrolą wszystich rzeczy które są na hat'ie, czyli rozmawia z IC i sterujen nimi.
+(btw, możesz dać też co-procesor czyli jakieś mniejsze MCU na hata jeśli nie ma IC do tego, zob. hat relay).
+Jego zadaniem jest też komunikowanie się CAN'em z komputerem pokładowym dużego Moducard'a i raportowaniem
+stanu czujników oraz sterowaniem silnikami i innymi efektorami.
+
+MCU można programować przez port USB, ale też zdalnie przez ChainLink. Czyli można flashować MCU zdalnie,
+z poziomu komputera pokładowego dużego Moducard'a
+
+To, i jak tak ci bardziej odpowiada to możesz użyć MCU bez dużego ModuCard'a i CAN'a żeby mieć
+Mikrokontroler z masą gotowych i obkodzonych kart rozszerzeń.
+
+\section{MiniModuCard - Kontroler}
+
+Kontroler MiniModuCard'a to główna płytka tego systemu. Ona steruje hat'ami oraz raportuje do dużego ModuCard'a.
+
+\subsection{Jakie złącza}
+MMS3 ma
+\begin{itemize}
+  \item Złącze chainbus + Altmode (AltMode możesz ignorować zob. \ref{AltMode}) do podłączania hat'ów
+  \item 2x złacze XT-60 do zasilania
+  \item 2x złącze ChainLink do podłączenia do Dużego ModuCard'a
+  \item USB-C do debugowania i flashowania
+\end{itemize}
+
+\subsection{Komunikacja z hat'ami}
+Jak pisałem w zasadzie działania, MMS3 ma SPI, I2C i UART podłączone do każdego hat'a. Domyślnie są odłączone, ale
+przez piny ADDR może się podłączyć do dowolnego. więcej o wybieraniu w \ref{sec:wybieranie_logika}.
+
+\subsection{Komunikacja z Dużym ModuCard'em}
+MMS3 raportuje i dostaje polecenia od dużego ModuCard' protokołem CAN. Podpięty jest przez złącza ChainLink.
+ChainLink zaczyna się na karcie adapter (zob. \ref{karta_adapter}) i idzie do MMS3. I teraz, MMS3 ma dwie złaczki
+ChainLink więc można podłączyć kolejnego MMS3 przez tą drugą łączke. Dlatego to jest Chain-Link.
+
+\subsection{Programowanie}
+MMS3 można programować albo przez złącze USB-C na nim, albo zdalnie przez ChainLink
+
+W obu wypadkach USB idzie na hub'a który podpina się na raz do programatora który jest na płytce, i do pinów USB Mikrokontrolera
+który jest na MMS3, więc możesz też użyć USB serial do debugowania.
+
+\subsubsection{Ale jak to dwa wejscia USB na raz?}
+Ten hub usb domyślnie jest podpięty do ChainLink'a. Jeśli podepniesz się fizycznie kablem USB do MMS3 to on
+automatycznie przełącza hub usb z ChainLink do USB-C.
+
+Bascially USB C ma priorytet nad ChainLink
+
+\subsection{Jaki proc jest włożony}
+Kontroler MiniModuCard to nie jest konkretna płtka, ale tak samo jak Hat rodzina płytek. Możesz zrobić
+Kontroler na ESP32, Atmega albo czym chcesz. W kole glównie używamy MMS3 na STM32F405 zrobionego przez Artema.
+
+Każdy dobry MMS3 musi mieć te wszystkie feature'y o których pisze, chyba że nie ma (\ref{MMS3_basic})
+
+\subsection{Zasilanie}
+MMS3 zasila wszystkie hat'y szyną 5V. Przez to musi mieć na sobie przetworke VBUS 12C-48V na 5V 1A.
+
+\subsection{MMS3 Basic} \label{MMS3_basic}
+Czasem do projektu nie potrzebujesz ChainLink'a, albo robić zasilania na MMS3 bo wystarczy ci 5V z USB.
+Możesz zrobić kontroler MiniModuCard na szybko i ominąć te featuer'y. Wtedy nazwywamy go wersją Basic.
+
+W kole raczej nie będziemy używać MMS3 Basic, ja je na szybko zrobiłem do swoich prywatnych projektów.
+
+
+\subsection{Rysunek MMS3}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/MMS3_MCU_Top_view.png}
+  \caption{Widok kontrolera MMS3 z góry}
+  %\label{fig:NoLabel}
+\end{figure}
+
+
+\section{MiniModuCard - Hat}
+Hat to ta płytka która faktycznie coś robi w MiniModuCard. Do niej są podłączone
+czujiniki, silniki i wszystko inne.
+
+\subsection{Złącza}
+\begin{itemize}
+  \item 2x chainbus (jeden na dole, jeden na górze) do podłączenie hat'ów
+  \item 2x XT60 jeśli potrzebujesz więcej zasilania
+  \item 1x 4pin złącze do flashowania EEPROM'A
+  \item i złącza JST-XH do których faktycznie podłączasz to co musisz
+\end{itemize}
+
+\subsection{Modularność}
+Na jednym hat'ie jest tylko jedna rzecz - osobny hat na serwo, osobny na czujiniki odległości itd.
+Dzięki temu każdy hat jest łatwo zaprojektować i łatwo je przenosić między projektami.
+
+Do jednego MMS3 można podlączyć do 8 hat'ów. jeśli potrzebujesz więcej, to musisz dodać nowy kontroler
+MiniModuCard ze swoją wieżą hat'ów
+
+\subsection{Krawędzi}
+Mamy 4 krawędzie, powiedzmy NEWS jak kierunki świata
+\begin{itemize}
+  \item N, długa górna - tam jest chainbus
+  \item E, krótka prawa - tam są diody led, zworki konfiguracyjne i przyciski
+  \item W, krórtka lewa - ta zostaje pusta
+  \item S, długa dolna - tam są złącza XT60 i JST-XH
+\end{itemize}
+
+
+
+\subsection{Rysunek hat'a}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/MMS3_Hat_Top_view.png}
+  \caption{Widok Hat'a z góry}
+  %\label{fig:NoLabel}
+\end{figure}
+
+
+
+\section{MiniModuCard - Łączenie hat'ów}
+Na początku masz kontroler MMS. Do niego wpinasz kolejne hat'y. Kontroler ma złącze albo 3x16 albo 2x16 goldpin żeński THT.
+Do niego wpinasz hat'a. Ten pierwszy hat ma z dołu złacze 2x16 goldpin męski SMD które wpinasz do MMS3.
+I teraz na pierwszym hat'ie na górze masz złącze 2x16 goldpin żeński SMD do którego możesz wpiąc kolejengo hat'a
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/MMS3_Tower_Side_view.png}
+  \caption{3 hat'y wpięte w Kontroler MMS3}
+  %\label{fig:NoLabel}
+\end{figure}
+
+\begin{itemize}
+  \item To żółte to złacze z kontrolera MMS3
+  \item A czarne to złącza hat'ów. Dolny jest męski, górny żeński
+\end{itemize}
+
+\section{Wybieranie hat'ów} \label{sec:wybieranie_logika}
+Haty są podpięte przez bus switch'e które odpinają i podpinają magistrale. tak wygląda Wybieranie
+
+\subsection{Jak to działa}
+MMS3 MCU ma 8 pinów, addr1 do addr8. Służą do adresowania hatów. Poprzez wystawianie
+na odpowiednie HIGH albo LOW można wybierać hat'y.
+
+\subsection{Wybieranie}
+Bus switche na hat'ach mają odwróconą logike. Jak dostają 3V3 to są wyłączone, a jak 0V to podpinają hat'a do magistral.
+Każdy hat patrzy tylko na swoją linie addr1 a reszte przekazują dalej.
+
+\subsection{Przesuniecie}
+Z MMS piny addr idą prosto na pierwszego hat'a. Ale z hat'ów idą już na skos - linia
+addr3 idzie na addr2, addr2 na addr1 itd. Linia wchodząca na addr1 jest używana przez hat'a
+i nie przekazywana dalej
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/MMS3_hat_selecting_diagram.png}
+  \caption{Tak wyglądaja te połączenia hat'ów i MMS3}
+  %\label{fig:NoLabel}
+\end{figure}
+
+\subsection{Przykład}
+
+MMS3 chce wybrać 3 hat.
+\begin{itemize}
+  \item Zacznamy z punktu wyjścia, wszystkie ADDR są na 3V3 (HIGH) czyli logiczne 0. Żaden hat nie jest wybrany
+  \item MMS3 ustawia ADDR3 na LOW
+  \item Pierwszy hat widzi że ADDR3 jest LOW, reszta HIGH. jego ADDR1 jest HIGH czyli nie reaguje
+  \item Drugi hat widzi że ADDR2 jest LOW, reszta HIGH. jego ADDR1 jest HIGH czyli nie reaguje
+  \item Trzeci hat widzi że ADDR1 jest LOW, reszta HIGH. jego ADDR1 jest LOW czyli się aktywuje
+  \item MMS3 komunikuje się z hatem 3
+  \item MMS3 ustawia ADDR3 na HIGH, hat się wyłącza
+  \item I wracamy do punktu wyjścia, można aktywować kolejny hat
+\end{itemize}
+
+To jest tylko komunikacja, takto haty pracują w tle (np. czujniki temperatury mogą się kalibrować,
+silniki kręcić ze stałą prędkością etc)
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/MMS3_hat_selecting_example.png}
+  \caption{To o czym właśnie napisałem}
+  %\label{fig:NoLabel}
+\end{figure}
+
+
+\section{MiniModuCard - Interefejsy i protokoły komunikacyjne}
+\subsection{MMS3 a hat'y}
+MSS3 i hat'y komunikują się po SPI, I2C i UART. przez złącze Chainbus
+
+\subsubsection{I2C}
+Normalne I2C, ale każdy hat ma osobną pule adresów. adres 1010000 jest zajęty
+przez EEPROM (np. M24C64 z A0 A1 A2 zwartymi do masy). EEPROM ma dane identyfikacyjne
+
+\subsubsection{SPI}
+No, normalne SPI. jak potrzebujesz mieć więcej slave'ów niż 1 to zabraknie ci Chip Select.
+Polecam dać expander GPIO po I2C, albo zaimplementować to na CH32v003 bo jest tańszy
+
+\subsubsection{UART}
+UART. Pamiętaj że podpinas się do hat'ów tylko na chwile więce nie możesz cały czas nasłuchiwać
+RX. Chcesz wysłać coś po TX i dostać odpowiedź.
+
+\subsection{MMS3 a Główny komputer moducard}
+MMS3 komunikuje się z komputerem pokładowym moducard'a po CAN w ChainLink i można go programować po nim też
+\subsubsection{CAN}
+Są 2 linie CAN. Jakoś to gada. Problem programisty. Jak jesteś programistą to masz problem
+% /#\#/\/#\ Trzeba coś tu dopisać
+
+\subsection{Programowanie i debuggowanie}
+Więc Hat'a da się debugować po USB C
+\subsubsection{USB hub}
+MMS3 ma wbudowanego USB hub'a i programator. więc każdego MMS3
+możesz debugować jednym kablem, bo masz USB hub -> Mikrokontroler (więc możesz użyć np. USB serial)
+i masz USB hub -> programator -> mikrokontroler (więc możesz wgrywać program prez to usb)
+\subsubsection{USB C a ChainLink}
+Więc to jest opcja debuggowania i flashowania lokalnego. Możesz też robić to samo z poziomu głónwego komputera Moducard
+przez ChainLink, bo do niego idzie USB przez ChainLink. MMS3 ma przełaczniki USB które automatycznie
+przełączają się miedzy USB-C a ChainLink. Normalnie jest do ChainLink, ale jak się podłączysz kablem
+to priorytet ma kable
+
+\subsubsection{Sznurek/gałąź MMS3}
+Każdty MMS3 ma 2 złącza ChainLink więc możesz je daisy chain'ować (łączyć pierwszy z kolejnym i tak dalej).
+Dzięki temu musisz wyprowadzić tylko jedno złącze ChainLink z ModuCard'a i do tego możesz podłaczyć ile chcesz MMS3.
+
+% /#\#/\/#\ Ile konkretnie
+Adnotacja: Chyba hub'y usb mają limit ile ich można dać za sobą, albo signal integrity USB się spierdzieli.
+Czyli jest jakiś limit, jak będe wiedział jaki to napisze
+
+\section{MiniModuCard - Altmode i Stopnie integracji} \label{AltMode}
+
+\subsection{O co chodzi z rzędem AltMode}
+MMS3 ma 3 rzędy pin'ów, a hat tylko 2. Wątek jest taki, mikrokontrolery zwykle mają więcej
+pinów niż potrzeba na sam chainbus więc te luźne wystawiliśmy na 3 rząd. Oto dlaczego
+
+Normalnie MMS3 używamy z chainbusem + hat'ami więc mamy wszystkie zalety modularności etc.
+Fajnie wszystko idzie jak prototypujesz albo rozwijasz projekt. Ale gdybyś chciał bardziej zintegrować,
+pomniejszyć projekt to możesz zrobić hat'a AltMode.
+
+Pinout rzędu AltMode jest inny dla każdego MMS3'a
+
+\subsection{A z hat'em AltMode?}
+Jak już masz przetestowane układy i kod, to możesz swoje 8 hatów połączyć w jednego dużego. Teraz możesz
+użyć pinów Altmode i adresowania jako zwyklłe GPIO i nowe magistrale komunikacyjne. Wtedy
+na jednego MMS3 wpinasz jedną dużą płytke która robi to samo co 8 hat'ów.
+
+Już raczej jej nie będziesz przenosił między projektami, ale to jest tylko do finalizacji projektów.
+I dalej, możesz na tą samą płtke dać samego MMS3 i mieć cały projekt na 1 PCB.
+
+Zaleta od zaczęcia tak zaraz od razu skipnięcia od 1 PCB jest taka że możesz wszystko stopniowo testować, łatwo modfikować i
+tanio prototypować.
+
+W kole nie używamy ani altmode, ani stopniów integracji projektu 2 i 3
+
+\subsubsection{Stopnie integracji}
+\begin{itemize}
+  \item Stopień 1 - MMS3 + 8 hatów ChainBus
+  \item Stopień 2 - MMS3 + 1 Hat AltMode
+  \item Stopień 3 - Wszystko na tym samym PCB
+\end{itemize}
+
+\section{MiniModuCard - Przykładowe MMS'y i Hat'y}
+\subsection{MMS3}
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/MMS3.png}
+  \caption{MMS3 STM32F405}
+  %\label{fig:NoLabel}
+\end{figure}
+
+
+\subsection{Hat'y}
+
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/MMS_hat_protocol.png}
+  \caption{Hat protocol}
+  %\label{fig:NoLabel}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/MMS_hat_stepper.png}
+  \caption{Hat stepper}
+  %\label{fig:NoLabel}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/MMS_hat_relay.png}
+  \caption{Hat relay}
+  %\label{fig:NoLabel}
+\end{figure}
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/MMS_hat_thermocouple.png}
+  \caption{Hat thermocouple}
+  %\label{fig:NoLabel}
+\end{figure}
+
+\newpage
+
+% /#\#/\/#\ Opis TBD
+\section{MiniModuCard - Budżet mocy}
+
+
+Normalnie MMS3 zasilasz ze złącza XT60 i to idzie na BRD VIN. MMS3 ma obowiązek zrobić z tego
+przetworke BUCK DC-DC na 5V co najmniej 1A. 12V Standby nie używajcie. I chainbus za dużo
+nie puści prądu BRD VIN przez siebie, wiec jak hat pobiera więcej prądu niż jakieś 185mA z niego
+to dajcie XT60 na swojego hat'a. Ona może puścić max 60A.
+
+Więcj jak mamy np. 1A 5V, to jak dasz 8 hat'ów to każdy może pociągnąć 125mA. Ale jak dasz tylko 2 hat'y,
+to już każdy może pociągnąć 500mA. A niektóre hat'y mogą ciągnąć mniej jak mają np. same czujniki.
+
+Na dole masz mniej wiecej limity, staraj się ich nie przekraczać a jak przekraczać to ostrożnie
+\begin{table}[h]
+  \centering
+  \renewcommand{\arraystretch}{1.5}
+  \begin{tabular}{|l|c|c|c|}
+    \hline
+    \textbf{Nazwa} & \textbf{Napięcie} & \textbf{Sumaryczny prąd} & \textbf{prąd na jeden hat} \\ \hline
+    5V             & 5.0 V             & 1.0 A                    & 125 mA                     \\ \hline
+    12V stby       & 12.0 V            & 0.5 A                    & 65 mA                      \\ \hline
+    BRD\_VIN       & 12.0 V -- 48.0 V  & 1.5 A                    & 185 mA                     \\ \hline
+  \end{tabular}
+\end{table}
+
+
+Komponenty podłączone do linii \texttt{BRD\_VIN} muszą być przystosowane do pracy z napięciem od 12V do \textbf{48 V}.
+
+
+\section{MiniModuCard - Wymagania dla hat'a}
+Tbh większość z tego jest już na templatce
+
+\begin{itemize}
+  \item Wymiary 100x50mm
+  \item Ma 6 otworów montażowych m2.5
+  \item Nie daje komponentów na keepout zone'ach (zob. sekcja mechaniczna)
+  \item I komponenty tylko z przodu, nie wyższe niż XXXmm % /#\#/\/#\
+  \item Złącza XT60 są na długiej krawędzi
+  \item Złącza wyjścicowe są na dłgiej krawędzi
+  \item Złącza wyjściwe są rastru 2.54mm i używamy JST-XH
+  \item zworki konfiguracyjne są na prawej krótkiej krawędzi
+  \item Przyciski, ledy też na prawej
+  \item lol lewa jest wolna
+  \item Złącze chainbus w dobrym miejscu, z góry female i z dołu male
+  \item chainbus prezsuwa piny addr, reszty nie
+  \item Obsługje napięcie na BRD VIN do 48V
+  \item Nie pobiera więcej prądu niż z budżetu mocy (kinda whatever)
+  \item podłącza chainbus tylko do SPI, I2C, UART i nie odwala nic dziwnego z nimi
+  \item nic dziwnego, między innymi sam nie zaczyna komunikacji tylko grzecznie czeka na MSS3 aż zacznie gadać
+  \item Podłącza magistrale tylko kiedy ADDR1 = LOW
+  \item ma EEPROM do identyfikacji po I2C o dobrym adresie i zgodnej komunikacji
+  \item Ma złącze I2C (3v3, GND, scl sda) żeby łatwo flashować EEPROM na prawej krawędzi
+  \item ma diode która się świeci jak hat jest wybrany
+  \item ma pullup'y/downy na komunikacji (i addr1) żeby nie była floating jak hat jest odpięty
+  \item Jest w licencji TO-DO % /#\#/\/#\
+  \item Ma zdjęcie, BOM na githubie
+  \item Ma dokumentacje na githubie
+  \item ma soft na githubie
+  \item Ma tagi hashtag XXX na dole dokumentacji żeby dało rade go wyszukać % /#\#/\/#\ zrób
+  \item Wszystkie złączki mają opsiany pinout na silkscreen'ie
+  \item Nazwa, autor i rewizja hat'a jest opisana na silkscreen'ie
+  \item Duuużo diod żeby się łądnie świeciło
+  \item Same złączki też opsiane do czego są dużymi literami żeby było ładnie
+\end{itemize}
+\section{MiniModuCard - Wymagania dla MMS'a}
+\begin{itemize}
+  \item Jakiś proc na nim
+  \item złącza XT-60
+  \item Przetworka VBUS -> 5V 1A
+  \item Przełączanie ADDR
+  \item obsługa protokołów na ChainBus
+  \item Wymiary, złącza i otwory w dobrych miejscach
+  \item Przelączanie USB między złączką C a ChainLink
+  \item USB hub na programator i USB z MCU
+  \item Obsługa ChainLink
+  \item 2x can
+\end{itemize}
+\section{MiniModuCard - Projektowanie hat'ów}
+TBD
+\section{MiniModuCard - Pinout złączy}
+\subsection{Chainbus + AltMode}
+Jest na MMS3
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/Footprint_Chainbus_altmode.png}
+  \caption{DIN 41612 pinout}
+  %\label{fig:NoLabel}
+\end{figure}
+
+\begin{table}[H]
+  \centering
+  \small
+  \begin{tabular}{@{}llll@{}}
+    \toprule
+    \textbf{Pin \#} & \textbf{Row A (Altmode)} & \textbf{Row B (Address/Bus)} & \textbf{Row C (Power)} \\ \midrule
+    1               & Altmode 1                & ADDR 1                       & GND                    \\
+    2               & Altmode 2                & ADDR 2                       & +5V                    \\
+    3               & Altmode 3                & ADDR 3                       & +5V                    \\
+    4               & Altmode 4                & ADDR 4                       & GND                    \\
+    5               & Altmode 5                & ADDR 5                       & BRD\_VIN               \\
+    6               & Altmode 6                & ADDR 6                       & BRD\_VIN               \\
+    7               & Altmode 7                & ADDR 7                       & BRD\_VIN               \\
+    8               & Altmode 8                & ADDR 8                       & BRD\_VIN               \\
+    9               & Altmode 9                & ChainBus SDA                 & GND                    \\
+    10              & Altmode 10               & ChainBus SCL                 & GND                    \\
+    11              & Altmode 11               & ChainBus CS                  & GND                    \\
+    12              & Altmode 12               & ChainBus SCK                 & GND                    \\
+    13              & Altmode 13               & ChainBus MOSI                & Reserved               \\
+    14              & Altmode 14               & ChainBus MISO                & Reserved               \\
+    15              & Altmode 15               & ChainBus RX                  & +12V stby              \\
+    16              & Altmode 16               & ChainBus TX                  & GND                    \\ \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Chainbus}
+Jest na każdym hat'ie
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/footprint_chainbus.png}
+  \caption{Złącza 2x16 SMD na górnej warstwie}
+  %\label{fig:NoLabel}
+\end{figure}
+
+Okay, wątek jest taki - ChainBus trzeba dać na górnej i dolnej warstwie. wszystkie piny poza ADDR idą
+bezpośrednio z dolnej do górnej, a ADDR idą z przeplotem.
+
+\begin{table}[!ht]
+  \centering
+  \caption{Chainbus in, dolna warstwa, 2x16 smd male}
+  \small
+  \begin{tabular}{@{}cl|cl@{}}
+    \toprule
+    \textbf{Pin} & \textbf{Sygnał} & \textbf{Pin} & \textbf{Sygnał} \\ \midrule
+    1            & GND             & 2            & ADDR1           \\
+    3            & +5V             & 4            & ADDR2           \\
+    5            & +5V             & 6            & ADDR3           \\
+    7            & GND             & 8            & ADDR4           \\
+    9            & VIN\_ChainBus   & 10           & ADDR5           \\
+    11           & VIN\_ChainBus   & 12           & ADDR6           \\
+    13           & VIN\_ChainBus   & 14           & ADDR7           \\
+    15           & VIN\_ChainBus   & 16           & ADDR8           \\
+    17           & GND             & 18           & ChainBus SDA    \\
+    19           & GND             & 20           & ChainBus SCL    \\
+    21           & GND             & 22           & ChainBus CS     \\
+    23           & GND             & 24           & ChainBus SCK    \\
+    25           & Pin\_25         & 26           & ChainBus MOSI   \\
+    27           & Pin\_27         & 28           & ChainBus MISO   \\
+    29           & +12V stby       & 30           & ChainBus TX     \\
+    31           & GND             & 32           & ChainBus RX     \\ \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \caption{ChainBus Out, górna warstwa, 2x16 smd female}
+  \small
+  \begin{tabular}{@{}cl|cl@{}}
+    \toprule
+    \textbf{Pin} & \textbf{Sygnał} & \textbf{Pin} & \textbf{Sygnał} \\ \midrule
+    1            & GND             & 2            & ADDR2           \\
+    3            & +5V             & 4            & ADDR3           \\
+    5            & +5V             & 6            & ADDR4           \\
+    7            & GND             & 8            & ADDR5           \\
+    9            & VIN\_ChainBus   & 10           & ADDR6           \\
+    11           & VIN\_ChainBus   & 12           & ADDR7           \\
+    13           & VIN\_ChainBus   & 14           & ADDR8           \\
+    15           & VIN\_ChainBus   & 16           & NC              \\
+    17           & GND             & 18           & ChainBus SDA    \\
+    19           & GND             & 20           & ChainBus SCL    \\
+    21           & GND             & 22           & ChainBus CS     \\
+    23           & GND             & 24           & ChainBus SCK    \\
+    25           & Pin\_25         & 26           & ChainBus MOSI   \\
+    27           & Pin\_27         & 28           & ChainBus MISO   \\
+    29           & +12V stby       & 30           & ChainBus TX     \\
+    31           & GND             & 32           & ChainBus RX     \\ \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{ChainLink}
+2x są na każdym MMS3 i są na kartach adapter
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/footprint_rj45.png}
+  \caption{Złącze RJ45}
+  %\label{fig:NoLabel}
+\end{figure}
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{@{}cll@{}}
+    \toprule
+    \textbf{Pin} & \textbf{Sygnał} \\ \midrule
+    1            & CAN1.-          \\
+    2            & CAN1.+          \\
+    3            & GND             \\
+    4            & CAN2.-          \\
+    5            & CAN2.+          \\
+    6            & +12V stby       \\
+    7            & USB\_MMS\_.D-   \\
+    8            & USB\_MMS\_.D+   \\ \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{XT60}
+Zasilanie, pewnie wszędzie jest
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/footprint_XT60.png}
+  \caption{XT60 męska i żeńska}
+  %\label{fig:NoLabel}
+\end{figure}
+
+\subsection{JST-XH}
+Wszystko idzie na JST-XH z rastrem 2.54 (same as golpin), więc nie można dać uniwersalnego pinoutu.
+
+Jedynie powiem że preferowany jest GND na pin'ie 1
+
+\subsection{I2C}
+Jak masz I2C na hat'ach to to jest preferowany pionout
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/footprint_I2C.png}
+  \caption{Zącze goldpin 1x4 z I2C na nim}
+  %\label{fig:NoLabel}
+\end{figure}
+
+\subsection{Programowanie MCU na hat'ach}
+Jeśli masz MCU na hat'ie to to są preferowane pinout'y złącz do flashowania
+
+\subsubsection{CH32V003}
+Jest podobne do WCH Link-E
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/footprint_jst_xh_3pin.png}
+  \caption{JST-XH 1x3}
+  %\label{fig:NoLabel}
+\end{figure}
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{@{}cll@{}}
+    \toprule
+    \textbf{Pin} & \textbf{Sygnał} \\ \midrule
+    1            & SWIO            \\
+    2            & GND             \\
+    3            & 3V3             \\
+  \end{tabular}
+\end{table}
+
+
+
+\section{Duży ModuCard - Zasada działania}
+\section{Duży ModuCard - Typy Kart}
+\section{Duży ModuCard - Rola Backplane'a}
+\section{Duży ModuCard - Przykładowe Karty}
+\section{Duży ModuCard - Bilans Mocy}
+\section{Duży ModuCard - Wymagania dla Kart}
+\section{Duży ModuCard - Wymagania dla Backplane'a}
+\section{Duży ModuCard - Projektowanie kart}
+\section{Duży ModuCard - Pinout złączy}
+
+
+\section{Pomiędzy systemami - Karta adapter i ChainLink} \label{karta_adapter}
+
 \chapter{Książka programisty}
 \section{Wstęp}
 Aktualnie nie mamy nic zaprogramowane. Powodzenia!
@@ -473,10 +1090,9 @@ symetryczne wiec paru wymiarów nie podałem.
 
 \subsection{Duży ModuCard}
 To Do
-\subsection{MiniModuCard}
-\subsubsection{MMS3 (Mikrokontroler)}
+\subsection{MiniModuCard - MMS3 (Mikrokontroler)}
 To Do
-\subsubsection{Hat}
+\subsection{MiniModuCard - Hat}
 Odległość między hat'em a hat'em albo MMS3 a hat'em to 1 złacze goldpin smd Męskie + wpięte w nie SMD Żeńskie
 \begin{figure}[!h]
   \centering
@@ -494,7 +1110,7 @@ Odległość między hat'em a hat'em albo MMS3 a hat'em to 1 złacze goldpin smd
 \end{figure}
 
 Te złącza w lewym dolnym to XT60 i tbh nie muszą być co do milimetra w tym miejscu.
-Ważne żeby były jak najbardziej w prawym dolnym, i pierwsze męskie a potem żeńskie
+Ważne żeby były jak najbardziej w lewym dolnym, i pierwsze męskie a potem żeńskie
 
 
 \begin{figure}[!h]
