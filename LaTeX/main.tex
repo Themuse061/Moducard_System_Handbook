@@ -226,8 +226,11 @@ Znowu to samo powtarzam w rozdziałach projektowanie kart/hatów. Jak nie załap
 Aktualnie książka jest do użytku wewnętrznego KoNaR-u, ale możecie na spokojnie
 ją udostępniać komu trzeba. Czasem będę rzucał inside joke'i albo nazwiskami jak coś.
 
-Fork jest mój, Wojtka Szafrańskiego, a siedzę głównie w elektronice. Ona będzie
+Fork jest mój, Wojtka Szafrańskiego (@themuse061 na Discordzie), a siedzę głównie w elektronice. Ona będzie
 najdokładniej opisana, mechanika też git powinna być, ale programowanie będzie tak sobie.
+
+\textbf{Oh, i możesz szukać "Jak projektować hat'a \ref{MiniModuCard - Projektowanie hatów}"
+  albo "jak projektować Karte \ref{Duży ModuCard - Projektowanie kart}"}
 
 \chapter{Introduction}
 
@@ -298,7 +301,7 @@ If you are a \textbf{system integrator}, Part~I Chapter~3
 (Assembly Rules) and Part~III Chapter~9 (Topology Planning)
 are the most immediately useful sections.
 
-\chapter{Primer -> Zacznij tutaj}
+\chapter{Primer -> Zacznij tutaj} \label{Primer}
 \section{Co i po co - Część \#1 "Co"}
 ModuCard to system dwóch standardów do tworzenia projektów robotycznych. Można w nim zrobić roboty, które wykonują
 skomplikowane czynności (chodzenie, regulacja procesów technologicznych, wizja komputerowa i inne).
@@ -477,7 +480,7 @@ Jest dużo różnych protokołów, płytek i wgl. Tu jest lista:
 
 \chapter{Książka elektroniczna}
 % /#\#/\/#\ zrób chapter o złączach jakie używamy (XT60, JST-XH etc)
-\section{MiniModuCard - zasada działania}
+\section{MiniModuCard - zasada działania} \label{MiniModuCard - zasada działania}
 \subsection{Overview}
 Jak masz dużego ModuCarda, to każda kartka ma swój MCU i gdybyś robił osobną kartę
 na każdy feature (sterownik silnika, kontroler LED-ów), to wyszłoby ci drogo, połowy
@@ -581,7 +584,7 @@ W kole raczej nie będziemy używać MMS3 Basic, ja je na szybko zrobiłem do sw
 \end{figure}
 
 
-\section{MiniModuCard - Hat}
+\section{MiniModuCard - Hat} \label{MiniModuCard - Hat}
 Hat to ta płytka, która faktycznie coś robi w MiniModuCard. Do niej są podłączone
 czujniki, silniki i wszystko inne.
 
@@ -881,8 +884,139 @@ Tbh większość z tego jest już na templatce:
   \item Obsługa ChainLink.
   \item 2x CAN.
 \end{itemize}
-\section{MiniModuCard - Projektowanie hatów}
-TBD
+\section{MiniModuCard - Projektowanie hatów} \label{MiniModuCard - Projektowanie hatów}
+
+\subsection{Co musisz zrobić}
+
+Jeśli tu jesteś, to znaczy że ktoś cię poprosił o zrobienie Hat'a do MiniModuCard'a.
+W tej książce jest cała dokumentacja systemu, ale postaram się streścić najwazniejsze
+rzeczy które musisz wiedzieć tutaj.
+
+Zakładam że dostałeś zadanie w stylu "zrób hat'a który odbiera GPS", "który
+steruje silnikem BLDC" albo "zrób hata z układem scalonym DRV17182". Jeśli się zgadza, to
+możesz czytać dalej
+
+\subsection{Co musisz wiedzieć}
+Powinieneś przeczytać Primer (\ref{Primer}), zasade działana MiniModuCard'a (\ref{MiniModuCard - zasada działania}) oraz sekcje o Hat'ach (\ref{MiniModuCard - Hat}).
+
+Pozwole sobie założyć że tego nie zrobiłeś, i na szybko jeszcze raz to opisze
+
+\subsubsection{Co to hat}
+
+Mamy system w którym jest płytka z mikroprocesorem, (np. STM32F405) i chcemy żeby coś robiła.
+Żeby to było modularne, oddzieliliśmy procesor i układy wyjściowe na osobne płytki. Te osobne
+płytki z układami wyjściowymi to są "Hat'y" i ty takiego masz robić
+
+Mówiąc układ wyjściowy mam na myśli np. właśnie sterownik silnika, albo moduł GPS. Cokolwiek
+co coś odczytuje albo steruje poza płytką.
+
+\subsubsection{Jak to działa}
+
+Procesor ma swoje pin'y (to co podpinasz arduino do modułów). One zmieniają swoje napiecia i sterują rzeczami)
+wyprowadzone na zlącze. Złącze ma konkretne
+rzeczy na konkretnyh pinach w standardzie który wymyśliliśmy (ChainBus) żebyśmy mogli
+łatwo wymieniać i projektować hat'y.
+
+Te konkretne rzeczy na konkretnych pinach to I2C, SPI i UART. To są takie mega
+często stosowane protokoły komunikacyjne. Ich będziesz używać do sterowania układami scalonymi
+na hat'ie.
+
+Czyli musisz znaleźć układ który robi to co chesz (np. sterownik termopary) żeby komunikował
+się po I2C SPI albo UART, a nie jakimś dziwny własnym protokołem.(Jak nie ma opcji i są tylko z własnym
+protokołem albo reszta jest droga, to muszisz dać po drodze innego proca np. ch32v003 który to ogarnie.
+Napisz do mnie albo innego elektronika żeby  ci to wytłumaczył)
+
+Jak masz ten układ wybrany, to musisz narysować w programie KiCad do czego jest podłączony. To jest schematic. Potem
+przenosisz na fizyczna płytke w tym samym programie. to jest PCB.
+
+
+Jeszcze jest system automatycznego wybierania Hat'ów przez piny ADDR ale nie musisz się
+o nim martwić bo już jest na templatce.
+
+\subsection{Templatka}
+Żeby było łatwiej projektować to zrobiłem projekt z podstawowaymi elementami hat'a na githubie
+który możesz z'fork'ować i na nim projektować.
+
+%\hyperlink{Link do repo}{github.com/KoNaR-Hefajstos/MMS3_hat_templates}
+
+Tak wygląda otworzony w programie kicad (musisz wejść w widok schematu/płytki)
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/MMS3_hat_template_schematic.png}
+  \caption{Widok schematic templatki}
+  %\label{fig:NoLabel}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{photos/MMS3_hat_template_pcb.png}
+  \caption{Widok płytki PCB templatki}
+  %\label{fig:NoLabel}
+\end{figure}
+
+(Zdjęcia mogą być stare, są z 18.07.26)
+
+\subsubsection{Noteworthy rzeczy o templatce}
+\begin{itemize}
+  \item Masz już zrobione złącze chainbus, adresowanie i reszte
+  \item Nie możesz rzucać Interboard connector, Bus switch, ID eeprom na schematic'u i śrub montażowych w lewym dolnym
+  \item Możesz zmienić przetwornice 5V -> 3V3 jeśli potrzebujesz i wiesz co robisz
+  \item Możesz usunąć ze schematic'a i PCB złącze XT60 jeśli go nie potrzebujesz
+  \item Na schematic'u możesz się popdpiać do I2C, SPI i UART jak wychodzą z tej ramki, za bus switch'em
+  \item schematic jest podzielony na  hierarhical sheet'y (np. Bus switch. Te prostokąty, możesz na nie dwa
+        razy kliknąć żeby zobaczyć do środka)
+  \item I2C, SPI i UART są w formie BUS connection. Zobacz w ID eeprom jak wchodzi gruba niebisa linia,
+        a w środku rozbija się an dwie małe zielone. Tak działają bus'y
+  \item Nie przesuwaj zablokowanych rzeczy na PCB
+\end{itemize}
+
+Basically musisz dodać swój układ i połączyć z jedną/dwoma/trzema protokołami komunikacyjnymi
+wychodzącymi z tej bordowej prezrywanej ramki. I nie usuwać/przesuwać ważnych rzeczy
+
+\subsection{Setup programów}
+\begin{itemize}
+  \item Musisz zainstalować KiCad'a
+  \item I te pluginy do niego:
+  \item BOM
+  \item 1
+  \item 2
+\end{itemize}
+
+\subsection{Jak robić schematic/PCB}
+Pełne tłumaczenie od zera jest out of scope tego dokumentu (wierze że znajdziesz poradnik na yt), ale
+
+\subsubsection{Pare moich komentarzy}
+\begin{itemize}
+  \item Jak możesz, to daj diody led do czego się da żeby widać było że coś się dzieje jak płytka działa (zob. hat protocol)
+  \item Jak skończysz robić PCB to opisz wszystkie złącza, diody i co się da na silkscreenie. (zob hat HC-SR04-HX711)
+  \item Pamiętaj podpisać jaki to hat, która wersja i kto to robił na płtce na silkscreen
+  \item W kicadzie jest widok 3D jak otowórz PCB. Zobacz go sobie
+  \item 1 / 1.5mm wielkości tekstu silkscreen to minimum żeby było fajnie widać
+  \item Jeśli układ który wybrałeś ma jakieś piny interrupt to je ignorujesz,
+        zostaw floating (do niczego nie podpięte). Jeśli ma jakieś piny konfuguracyjne to daj je na zworki goldpin na
+        boku płytki (jeśli trzeba je często przełączać) albo przez zworke lutowalną/rezystor na samej płytce (jeśli mniej często
+        trzeba je przełączać). Tutaj musisz troche pomyśleć jak to musisz zrobić żeby było dobrze
+  \item Jako że nie ma wyprowadzonych zwykłych pinów do hat'a, tylko same protokoły komunikacyjne
+        jeśli będziesz ich potrzebował to daj expander GPIO po I2C
+  \item Robienie schematic'a (co do czego jest podłaczone) nie jest trudne. Basically musisz jakąś
+        "Typical design" z noty katalogowej układu (ang. datasheet) albo płytke którą już ktoś zrobił
+  \item jak robisz fork'a, to chcesz żeby właścicelem repo była organizacja Konar'u (np. Hefajstos) a nie ty
+        bo jak jest ciebie to nie mam dostępu żeby poprawić płytke jak na nią patrze
+\end{itemize}
+
+\subsubsection{spoko miejsca do znalezienia układu i dokumentacji}
+\begin{itemize}
+  \item
+\end{itemize}
+
+\subsubsection{Spoko filmy/źródła o projektoaniu schematic'ów/PCB}
+\begin{itemize}
+  \item
+\end{itemize}
+
+
+
 \section{MiniModuCard - Pinout złączy}
 \subsection{ChainBus + AltMode}
 Jest na MMS3.
@@ -1068,7 +1202,8 @@ Jest podobne do WCH Link-E.
 \section{Duży ModuCard - Bilans Mocy}
 \section{Duży ModuCard - Wymagania dla Kart}
 \section{Duży ModuCard - Wymagania dla Backplane'a}
-\section{Duży ModuCard - Projektowanie kart}
+\section{Duży ModuCard - Projektowanie kart} \label{Duży ModuCard - Projektowanie kart}
+Sorka, To be done
 \section{Duży ModuCard - Pinout złączy}
 
 
@@ -1123,6 +1258,16 @@ Ważne, żeby były jak najbardziej w lewym dolnym i pierwsze męskie, a potem �
 
 \chapter{Książka system integrator}
 \chapter{Książka ecosystem maintainer}
+
+Okay, jako że to jest mój fork to sobie zapisze notatki co do rozwoju systemu
+
+\begin{itemize}
+  \item Nazwa MMS3 both do systemu Kontroler + hat i też do samego controlera jest confusing
+  \item trzeba wymyślić nazwe na hat'y który 1. nie zabierają ADDR 2. Odwalaja coś z ADDR (hat PSU i hat hat expander)
+  \item każdy projekt na githubie musi mieć tag żeby dało rade go szukać sensownie
+  \item programowanie musi być proste, KISS it or nobody will use it
+  \item Trzeba porządnie usiąść do licencji prawnych. Hat'y mają jakieś, ale to temp solutions
+\end{itemize}
 
 
 \end{document}
