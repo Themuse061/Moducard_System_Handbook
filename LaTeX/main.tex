@@ -232,74 +232,74 @@ najdokładniej opisana, mechanika też git powinna być, ale programowanie będz
 \textbf{Oh, i możesz szukać "Jak projektować hat'a \ref{MiniModuCard - Projektowanie hatów}"
   albo "jak projektować Karte \ref{Duży ModuCard - Projektowanie kart}"}
 
-\chapter{Introduction}
+% \chapter{Introduction}
 
-\section{About This Handbook}
+% \section{About This Handbook}
 
-This handbook describes the \mcsfull\ (\mcs) interface standard —
-a system of interlocking modular robotic cards that can be freely
-combined, extended, and reconfigured without tools.
+% This handbook describes the \mcsfull\ (\mcs) interface standard —
+% a system of interlocking modular robotic cards that can be freely
+% combined, extended, and reconfigured without tools.
 
-\mcsbox{Read this chapter in full before assembling any modules.
-  Incorrect insertion order may damage bus termination circuits.}
+% \mcsbox{Read this chapter in full before assembling any modules.
+%   Incorrect insertion order may damage bus termination circuits.}
 
-The document is structured in four self-contained parts. Each part
-can be read independently; cross-references indicate dependencies
-where they exist.
+% The document is structured in four self-contained parts. Each part
+% can be read independently; cross-references indicate dependencies
+% where they exist.
 
-\section{What Is \mcsfull?}
+% \section{What Is \mcsfull?}
 
-\mcs\ is a family of interchangeable robotic building blocks.
-Every module exposes four standardised connector faces
-(N, S, E, W) and communicates over a shared differential bus.
-Modules are hot-swappable: the bus protocol detects insertion
-and negotiates addresses automatically.
+% \mcs\ is a family of interchangeable robotic building blocks.
+% Every module exposes four standardised connector faces
+% (N, S, E, W) and communicates over a shared differential bus.
+% Modules are hot-swappable: the bus protocol detects insertion
+% and negotiates addresses automatically.
 
-\medskip
-\noindent Core properties at a glance:
+% \medskip
+% \noindent Core properties at a glance:
 
-\begin{itemize}[itemsep=3pt, topsep=4pt, leftmargin=*]
-  \item \textbf{Power:} \SI{24}{\volt} shared rail,
-        \SI{3}{\ampere} per face maximum
-  \item \textbf{Data:} \SI{10}{\mega bit\per\second}
-        half-duplex serial, CRC-16 framing
-  \item \textbf{Addressing:} automatic negotiation on hot-attach
-  \item \textbf{Topology:} tree or daisy-chain, up to 63 modules
-\end{itemize}
+% \begin{itemize}[itemsep=3pt, topsep=4pt, leftmargin=*]
+%   \item \textbf{Power:} \SI{24}{\volt} shared rail,
+%         \SI{3}{\ampere} per face maximum
+%   \item \textbf{Data:} \SI{10}{\mega bit\per\second}
+%         half-duplex serial, CRC-16 framing
+%   \item \textbf{Addressing:} automatic negotiation on hot-attach
+%   \item \textbf{Topology:} tree or daisy-chain, up to 63 modules
+% \end{itemize}
 
-\section{Conventions Used in This Handbook}
+% \section{Conventions Used in This Handbook}
 
-\begin{description}[style=nextline, leftmargin=10mm,
-    itemsep=4pt, topsep=4pt]
-  \item[\texttt{Monospace}]
-        Register names, bus commands, and literal byte values.
-  \item[\textbf{Bold sans}]
-        First use of a defined term; see Glossary (Appendix~A).
-  \item[{[ranges]}]
-        Square brackets denote inclusive value ranges,
-        e.g.\ \texttt{[0x00--0xFF]}.
-  \item[Dimensions]
-        All dimensions in millimetres at \SI{20}{\degreeCelsius}
-        unless otherwise stated.
-\end{description}
+% \begin{description}[style=nextline, leftmargin=10mm,
+%     itemsep=4pt, topsep=4pt]
+%   \item[\texttt{Monospace}]
+%         Register names, bus commands, and literal byte values.
+%   \item[\textbf{Bold sans}]
+%         First use of a defined term; see Glossary (Appendix~A).
+%   \item[{[ranges]}]
+%         Square brackets denote inclusive value ranges,
+%         e.g.\ \texttt{[0x00--0xFF]}.
+%   \item[Dimensions]
+%         All dimensions in millimetres at \SI{20}{\degreeCelsius}
+%         unless otherwise stated.
+% \end{description}
 
-\mcsbox[Important]{Chapters marked $\star$ in the Table of Contents
-  contain normative requirements (shall / shall not).
-  All other chapters are informative.}
+% \mcsbox[Important]{Chapters marked $\star$ in the Table of Contents
+%   contain normative requirements (shall / shall not).
+%   All other chapters are informative.}
 
-\section{How To Use This Handbook}
+% \section{How To Use This Handbook}
 
-If you are a \textbf{hardware designer}, start with Part~I
-(Mechanical) and Part~II (Electrical), then refer to Part~IV
-(Conformance) for test procedures.
+% If you are a \textbf{hardware designer}, start with Part~I
+% (Mechanical) and Part~II (Electrical), then refer to Part~IV
+% (Conformance) for test procedures.
 
-If you are a \textbf{firmware developer}, start with Part~III
-(Communication Protocol), where the complete packet format and
-API are defined.
+% If you are a \textbf{firmware developer}, start with Part~III
+% (Communication Protocol), where the complete packet format and
+% API are defined.
 
-If you are a \textbf{system integrator}, Part~I Chapter~3
-(Assembly Rules) and Part~III Chapter~9 (Topology Planning)
-are the most immediately useful sections.
+% If you are a \textbf{system integrator}, Part~I Chapter~3
+% (Assembly Rules) and Part~III Chapter~9 (Topology Planning)
+% are the most immediately useful sections.
 
 \chapter{Primer -> Zacznij tutaj} \label{Primer}
 \section{Co i po co - Część \#1 "Co"}
@@ -696,7 +696,7 @@ MMS3 i haty komunikują się po SPI, I2C i UART przez złącze ChainBus.
 
 \subsubsection{I2C}
 Normalne I2C, ale każdy hat ma osobną pulę adresów. Adres 1010000 jest zajęty
-przez EEPROM (np. M24C64 z A0 A1 A2 zwartymi do masy). EEPROM ma dane identyfikacyjne.
+przez EEPROM (np. M24C64 z A0 A1 A2 zwartymi do masy). EEPROM ma dane identyfikacyjne (nazwa, UUID, hardware revision, software revision)
 
 \subsubsection{SPI}
 No, normalne SPI. Jak potrzebujesz mieć więcej slave'ów niż 1, to zabraknie ci Chip Select.
@@ -910,34 +910,34 @@ płytki z układami wyjściowymi to są "Hat'y" i ty takiego masz robić
 Mówiąc układ wyjściowy mam na myśli np. właśnie sterownik silnika, albo moduł GPS. Cokolwiek
 co coś odczytuje albo steruje poza płytką.
 
+Inaczej mówiąc, hat to tak jakby shield na arduino.
+
 \subsubsection{Jak to działa}
 
-Procesor ma swoje pin'y (to co podpinasz arduino do modułów). One zmieniają swoje napiecia i sterują rzeczami)
-wyprowadzone na zlącze. Złącze ma konkretne
-rzeczy na konkretnyh pinach w standardzie który wymyśliliśmy (ChainBus) żebyśmy mogli
+Procesor ma swoje pin'y (to co podpinasz arduino do modułów). One zmieniają swoje napiecia i sterują rzeczami
+wyprowadzone na zlącze ChainBus. Złącze ma konkretne
+rzeczy na konkretnyh pinach żeby było
 łatwo wymieniać i projektować hat'y.
 
 Te konkretne rzeczy na konkretnych pinach to I2C, SPI i UART. To są takie mega
-często stosowane protokoły komunikacyjne. Ich będziesz używać do sterowania układami scalonymi
+często stosowane protokoły komunikacyjne. Ich będziesz używać do sterowania układami scalonymi (IC)
 na hat'ie.
 
-Czyli musisz znaleźć układ który robi to co chesz (np. sterownik termopary) żeby komunikował
-się po I2C SPI albo UART, a nie jakimś dziwny własnym protokołem.(Jak nie ma opcji i są tylko z własnym
-protokołem albo reszta jest droga, to muszisz dać po drodze innego proca np. ch32v003 który to ogarnie.
-Napisz do mnie albo innego elektronika żeby  ci to wytłumaczył)
+Twoje zadanie to znaleźć układ który robi to co chesz (np. sterownik termopary) taki, żeby komunikował
+się po I2C SPI albo UART, a nie jakimś dziwny własnym protokołem. Jak znajdziesz już to zapytaj się
+osoby od której dostałeś zadanie czy będzie pasował.
 
-Jak masz ten układ wybrany, to musisz narysować w programie KiCad do czego jest podłączony. To jest schematic. Potem
-przenosisz na fizyczna płytke w tym samym programie. to jest PCB.
+Jak masz ten układ wybrany, to musisz narysować w programie "KiCad" do czego jest podłączony. To jest schematic. Potem
+przenosisz go na fizyczna płytke w tym samym programie. Wtedy masz PCB.
 
-
-Jeszcze jest system automatycznego wybierania Hat'ów przez piny ADDR ale nie musisz się
-o nim martwić bo już jest na templatce.
+(Jeszcze jest system automatycznego wybierania Hat'ów przez piny ADDR ale nie musisz się
+o nim martwić bo już jest na templatce)
 
 \subsection{Templatka}
 Żeby było łatwiej projektować to zrobiłem projekt z podstawowaymi elementami hat'a na githubie
 który możesz z'fork'ować i na nim projektować.
 
-%\hyperlink{Link do repo}{github.com/KoNaR-Hefajstos/MMS3_hat_templates}
+Link -> \url{https://github.com/KoNaR-Hefajstos/MMS3_hat_templates}
 
 Tak wygląda otworzony w programie kicad (musisz wejść w widok schematu/płytki)
 
@@ -960,61 +960,133 @@ Tak wygląda otworzony w programie kicad (musisz wejść w widok schematu/płytk
 \subsubsection{Noteworthy rzeczy o templatce}
 \begin{itemize}
   \item Masz już zrobione złącze chainbus, adresowanie i reszte
-  \item Nie możesz rzucać Interboard connector, Bus switch, ID eeprom na schematic'u i śrub montażowych w lewym dolnym
-  \item Możesz zmienić przetwornice 5V -> 3V3 jeśli potrzebujesz i wiesz co robisz
-  \item Możesz usunąć ze schematic'a i PCB złącze XT60 jeśli go nie potrzebujesz
-  \item Na schematic'u możesz się popdpiać do I2C, SPI i UART jak wychodzą z tej ramki, za bus switch'em
+  \item Nie możesz rzucać Interboard connector, Bus switch, ID eeprom na schematic'u. One muszą zostać takie jakie są
+  \item Nie zmieniaj rozmiaru płytki PCB i nie ruszaj rozstawu śrub montażowych oraz złącz ChainBus.
+  \item Możesz usunąć ze schematic'a i PCB złącze XT60 jeśli go nie potrzebujesz (ono jest jak potrzebujesz dużo prądu)
+  \item Na schematic'u możesz się popdpiać do I2C, SPI i UART jak wychodzą z tej ramki, za bus switch'em. Nie ruszaj nic w środku ramki
   \item schematic jest podzielony na  hierarhical sheet'y (np. Bus switch. Te prostokąty, możesz na nie dwa
-        razy kliknąć żeby zobaczyć do środka)
+        razy kliknąć żeby zobaczyć do środka). Prosze też ich używaj <3
+  \item O, i co do hierarhical sheet'ów (schematów hierarhicznych) to możesz zobaczyć czy na innym hat'ie
+        nie ma jakiegoś który ci się przyda. Zą opisane w readme
   \item I2C, SPI i UART są w formie BUS connection. Zobacz w ID eeprom jak wchodzi gruba niebisa linia,
-        a w środku rozbija się an dwie małe zielone. Tak działają bus'y
-  \item Nie przesuwaj zablokowanych rzeczy na PCB
+        a w środku rozbija się an dwie małe zielone.
 \end{itemize}
 
 Basically musisz dodać swój układ i połączyć z jedną/dwoma/trzema protokołami komunikacyjnymi
 wychodzącymi z tej bordowej prezrywanej ramki. I nie usuwać/przesuwać ważnych rzeczy
 
+Pare jeszcze rzeczy jest napisane w readme template'a
+
 \subsection{Setup programów}
 \begin{itemize}
-  \item Musisz zainstalować KiCad'a
+  \item Musisz zainstalować KiCad'a \url{https://www.kicad.org}
   \item I te pluginy do niego:
-  \item BOM
-  \item 1
-  \item 2
+  \item Do generowania pliku BOM (Bill of materials) \url{https://github.com/openscopeproject/InteractiveHtmlBom}
+  \item Do generowania plików produkcyjnych (tzw. gerber) \url{https://github.com/Bouni/kicad-jlcpcb-tools}
+  \item Do pobierania footprint'ów komponentów z LCSC \url{https://github.com/uPesy/easyeda2kicad.py}
 \end{itemize}
 
 \subsection{Jak robić schematic/PCB}
-Pełne tłumaczenie od zera jest out of scope tego dokumentu (wierze że znajdziesz poradnik na yt), ale
+Pełne tłumaczenie od zera jest out of scope tego dokumentu (wierze że znajdziesz jakiś fajny poradnik na yt), ale
 
-\subsubsection{Pare moich komentarzy}
+\subsection{Pobieranie symboli i footprint'ów - pasywki}
+(symbol - element na schematic'u. Jakie ma połączenia. Footpint - element na PCB. jaki ma fizyczny kształt)
+
+Zwykle zamawiamy PCB częściowo zlutowane (basic assembly) z JLCPCB. Trzeba używać komponentów od nich żeby nie trzeba było
+ich później ręcznie wybierać przy zamawianu. Dodatkowym bonusem jest to że ładnie widać je na modelu 3D.
+
+Elementy pasywne (pasywki - rezystory, kondensatory, led'y etc) są już pobrane razem z pluginami. Musisz tylko dobre wybrać.
+Dobre, to znaczy z kategorii PCM\_JLCPCB.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{./photos/KiCad_adding_JLCPCB_components.png}
+  \caption{Widok z dodawania komponentów KiCad}
+  %\label{fig:NoLabel}
+\end{figure}
+
+Staraj się wybierać jak możesz komponenty "Basic Component". Za każdy inny komponent trzeba zapłacić dodatkowo 1.5\$ za załadowanie
+do maszny pick and place. Zazwyczaj basic będą tylko podstawowe rezystory, kondensatory, diody (w tym LED), oscylatory i pare innych. Pełną liste możesz
+znaleźć wchodząc na strone \url{https://jlcpcb.com/parts} i odfiltrować tylko te basic.
+
+Jak nie ma rezystora którego potrzebujesz to możesz połączyć 2/3 ze sobą. KiCad ma wbudowany do tego kalkulator.
+
+\subsection{Pobieranie symboli i footprint'ów - IC}
+Jeśli nie ma twojego komponentu od automatycznie pobranego do KiCad'a (czyli większość nie-basic) musisz go ręcznie pobrać. Używamy
+do tego plugina easyeda2kicad.
+
+A więc, procedura której ja używam wygląda tak
+\begin{itemize}
+  \item znajdź swój komponent na \url{https://www.lcsc.com}
+  \item otwórz CMD (konsole) w \textbf{folder\_twojego\_hat'a}/hardware/lib (możesz wejśc do lib, kliknąć tam na górze jak jest napisane
+        w jakim folderze jesteś (path) w pustym miejscu tak żeby ci się podświetliło na niebiesko, wpisać "CMD" i dać enter)
+  \item Użyj komendy: \textbf{easyeda2kicad --lcsc\_id <ID\_komponentu\_LCSC> --full --output ./<nazwa\_folderu>}
+
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{./photos/using_easyeda2kicad.png}
+  \caption{Komenda do pobrania komponentu przez easyeda2kicad}
+  %\label{fig:NoLabel}
+\end{figure}
+
+\begin{itemize}
+
+  \item powinno ci się pobrać plik \textbf{nazwa\_folderu.kicad\_sym} i foldery \textbf{nazwa\_folderu.3dshapes} oraz \textbf{nazwa\_folderu.pretty}. Jeśli ich nie masz to w
+        złym miejscu otwarłeś CMD.
+  \item przenieś .kicad\_sym oraz folder .3dshapes do folderu .pretty
+  \item otwórz swój projekt (dwa razy kliknij na .kicad\_pro)
+  \item Załaduj symbol -> wejdź w symbol editor, w lewym górnym wybierz \text{File} -> \text{Add library} i dodaj plik .kicad\_sym jako "Add new library to project library table"
+  \item Teraz załaduj footprint -> pójdź spowrotem do projektu, wejdź w footprint editor, i tak samo jak wcześnij tylko wybierz folder .pretty
+  \item Gotowe! Teraz możesz wejść do swojego projektu (widok schematic) i dodać świeżo zaimportowany komponent. Powienen mieć od razu footprint i model 3D.
+\end{itemize}
+
+
+
+\subsection{Pare moich komentarzy}
 \begin{itemize}
   \item Jak możesz, to daj diody led do czego się da żeby widać było że coś się dzieje jak płytka działa (zob. hat protocol)
   \item Jak skończysz robić PCB to opisz wszystkie złącza, diody i co się da na silkscreenie. (zob hat HC-SR04-HX711)
-  \item Pamiętaj podpisać jaki to hat, która wersja i kto to robił na płtce na silkscreen
+  \item Pamiętaj podpisać jaki to hat, która wersja i kto ją zrobił na płytce na silkscreen
   \item W kicadzie jest widok 3D jak otowórz PCB. Zobacz go sobie
   \item 1 / 1.5mm wielkości tekstu silkscreen to minimum żeby było fajnie widać
+  \item Używaj pasywek wielkości 0603
   \item Jeśli układ który wybrałeś ma jakieś piny interrupt to je ignorujesz,
-        zostaw floating (do niczego nie podpięte). Jeśli ma jakieś piny konfuguracyjne to daj je na zworki goldpin na
-        boku płytki (jeśli trzeba je często przełączać) albo przez zworke lutowalną/rezystor na samej płytce (jeśli mniej często
-        trzeba je przełączać). Tutaj musisz troche pomyśleć jak to musisz zrobić żeby było dobrze
-  \item Jako że nie ma wyprowadzonych zwykłych pinów do hat'a, tylko same protokoły komunikacyjne
-        jeśli będziesz ich potrzebował to daj expander GPIO po I2C
+        zostaw je floating (do niczego nie podpięte). Jeśli ma jakieś piny konfuguracyjne to daj je na zworki goldpin na
+        boku płytki (jeśli trzeba je często przełączać. goldpin kątowy jest spoko) albo przez zworke lutowalną/rezystor na samej płytce (jeśli mniej często
+        trzeba je przełączać). Tutaj musisz troche pomyśleć jak to musisz zrobić żeby było dobrze. Zapytaj się kogoś jak nie wiesz
+  \item Jako że nie ma wyprowadzonych zwykłych pinów GPIO do hat'a, tylko same protokoły komunikacyjne to może ci ich brakować.
+        Jeśli będziesz ich potrzebował to daj expander GPIO po I2C
   \item Robienie schematic'a (co do czego jest podłaczone) nie jest trudne. Basically musisz jakąś
         "Typical design" z noty katalogowej układu (ang. datasheet) albo płytke którą już ktoś zrobił
   \item jak robisz fork'a, to chcesz żeby właścicelem repo była organizacja Konar'u (np. Hefajstos) a nie ty
-        bo jak jest ciebie to nie mam dostępu żeby poprawić płytke jak na nią patrze
+        bo jak jest na ciebie to nie mam dostępu żeby poprawić płytke jak ją sprawdzam
+  \item  złącza wyjściowe (to po co robisz płytke) daj jako kątowe JST-XH 2.5mm/2.54mm (któreś z tych dwuch)
+  \item  Złącza konfiguracyjne (jeśli jakieś masz) daj na prawej krawędzi hat'a. Reszte rzeczy na dolną. Lewą zostaw pustą
+  \item Jeśli szukasz układu scalonego i są tylko z własnym
+        protokołem albo reszta jest droga, to możesz dać po drodze innego proca np. ch32v003 który to przetłumaczy na I2C/SPi.
+        Napisz do mnie albo innego ogarniętego elektronika żeby ci to wytłumaczył
+  \item Komponenty zamawiamy zwykle albo z TME, Mouser albo LCSC. TME jest preferowane, ale jest drogo i mało komponentów
 \end{itemize}
+
+\subsection{Dodatkowe źródła do obczajenia}
 
 \subsubsection{spoko miejsca do znalezienia układu i dokumentacji}
 \begin{itemize}
-  \item
+  \item Moduły do arduino
+  \item \url{https://www.mikroe.com}
 \end{itemize}
 
-\subsubsection{Spoko filmy/źródła o projektoaniu schematic'ów/PCB}
+\subsubsection{Spoko filmy/źródła o projektowaniu schematic'ów/PCB}
 \begin{itemize}
-  \item
+  \item \url{https://www.youtube.com/@PhilsLab}
+  \item \url{https://blog.poly.nomial.co.uk/2025-08-10-creating-high-quality-electronics-schematics.html}
 \end{itemize}
 
+\subsubsection{Na zakończenie}
+To tyle z tłumaczenia. Jeśli jest coś czego nie rozumiesz, myślisz że można lepiej wytłumaczyć albo brakuje zdjęć to prosze \textbf{prosze}
+napisz mi co. Imo bardzo ważne jest żeby ta część dokumentacji była zrozumiała, bo poczatkujący będą ją próbowali zrozumieć.
 
 
 \section{MiniModuCard - Pinout złączy}
