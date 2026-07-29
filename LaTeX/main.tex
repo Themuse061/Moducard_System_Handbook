@@ -518,8 +518,8 @@ MCU zajmuje się kontrolą wszystkich rzeczy, które są na hacie, czyli rozmawi
 Jego zadaniem jest też komunikowanie się CAN-em z komputerem pokładowym dużego ModuCarda i raportowanie
 stanu czujników oraz sterowaniem silnikami i innymi efektorami.
 
-MCU można programować przez port USB, ale też zdalnie przez ChainLink. Czyli można flashować MCU zdalnie
-z poziomu komputera pokładowego dużego ModuCarda.
+MCU można programować przez port USB, ale też zdalnie przez ChainLink. (Można flashować MCU zdalnie
+z poziomu komputera pokładowego dużego ModuCarda)
 
 To, i jak tak ci bardziej odpowiada, to możesz użyć MCU bez dużego ModuCarda i CAN-a, żeby mieć
 mikrokontroler z masą gotowych i obkodzonych kart rozszerzeń.
@@ -544,7 +544,7 @@ przez piny ADDR może się podłączyć do dowolnego. Więcej o wybieraniu w \re
 \subsection{Komunikacja z dużym ModuCardem}
 MMS3 raportuje i dostaje polecenia od dużego ModuCarda protokołem CAN. Podpięty jest przez złącza ChainLink.
 ChainLink zaczyna się na karcie adapter (zob. \ref{karta_adapter}) i idzie do MMS3. I teraz, MMS3 ma dwie złączki
-ChainLink, więc można podłączyć kolejnego MMS3 przez tę drugą łączkę. Dlatego to jest ChainLink.
+ChainLink, więc można podłączyć kolejnego MMS3 przez tę drugą łączkę (Daisy-Chain). Dlatego to jest ChainLink.
 
 \subsection{Programowanie}
 MMS3 można programować albo przez złącze USB-C na nim, albo zdalnie przez ChainLink.
@@ -553,25 +553,33 @@ W obu wypadkach USB idzie na huba, który podpina się naraz do programatora, kt
 który jest na MMS3, więc możesz też użyć USB serial do debugowania.
 
 \subsubsection{Ale jak to dwa wejścia USB naraz?}
-Ten hub USB domyślnie jest podpięty do ChainLinka. Jeśli podepniesz się fizycznie kablem USB do MMS3, to on
-automatycznie przełącza hub USB z ChainLinka do USB-C.
+Jest zrobiony USB switch który automatycznie przełącza między USB-C a ChainLink. Jak podepniesz USB-C to
+switch to wykrywa i przełącza proca na USB-C.
 
-Basically USB-C ma priorytet nad ChainLinkiem.
+Basically USB-C ma priorytet nad ChainLink'iem.
+
+\subsubsection{Programowanie z ChainLink'a}
+Troche jank, ale w ChainLink'u USB nie jest do niczego podłaczone. Żeby podlączyć jakiegoś MMS3 do USB
+musisz przełączyć taki przełączniczek na MMS3 żeby się dioda świeciła. Wtedy MMS3 jest gotowy do
+komunikacji przez ChainLink.
+
+Tylko jeden MMS3 można na raz programować po USB na ChainLink'u (czyli w wiązce MMS3 na tylko jednym
+ta dioda może być zapalona bo nie będzie działać). I ofc jak jesteś podpięty po USB-C to ono ma priorytet
 
 \subsection{Jaki proc jest włożony}
 Kontroler MiniModuCard to nie jest konkretna płytka, ale tak samo jak hat — rodzina płytek. Możesz zrobić
 kontroler na ESP32, Atmedze albo czym chcesz. W kole głównie używamy MMS3 na STM32F405 zrobionego przez Artema.
 
-Każdy dobry MMS3 musi mieć te wszystkie feature'y, o których piszę, chyba że nie ma (\ref{MMS3_basic}).
+% Każdy dobry MMS3 musi mieć te wszystkie feature'y, o których piszę, chyba że nie ma (\ref{MMS3_basic}).
 
 \subsection{Zasilanie}
 MMS3 zasila wszystkie haty szyną 5V. Przez to musi mieć na sobie przetworkę VBUS 12V-48V na 5V 1A.
 
-\subsection{MMS3 Basic} \label{MMS3_basic}
-Czasem do projektu nie potrzebujesz ChainLinka albo robienia zasilania na MMS3, bo wystarczy ci 5V z USB.
-Możesz zrobić kontroler MiniModuCard na szybko i ominąć te feature'y. Wtedy nazywamy go wersją Basic.
+% \subsection{MMS3 Basic} \label{MMS3_basic}
+% Czasem chce użyć hat'ów, ale nie chce używać całego MMS3. Wtedy używam MMS3 basic -> MMS3 ale nie
+% ma wszystkich feauture'ów (np. Nie ma przetworki i CAN).
 
-W kole raczej nie będziemy używać MMS3 Basic, ja je na szybko zrobiłem do swoich prywatnych projektów.
+% W kole raczej nie będziemy używać MMS3 Basic, ja je na szybko zrobiłem do swoich prywatnych projektów.
 
 
 \subsection{Rysunek MMS3}
@@ -700,17 +708,19 @@ przez EEPROM (np. M24C64 z A0 A1 A2 zwartymi do masy). EEPROM ma dane identyfika
 
 \subsubsection{SPI}
 No, normalne SPI. Jak potrzebujesz mieć więcej slave'ów niż 1, to zabraknie ci Chip Select.
-Polecam dać ekspander GPIO po I2C albo zaimplementować to na CH32V003, bo jest tańszy.
+Polecam dać ekspander GPIO po I2C albo zaimplementować expander na CH32V003, bo jest tańszy.
 
 \subsubsection{UART}
 UART. Pamiętaj, że podpinasz się do hatów tylko na chwilę, więc nie możesz cały czas nasłuchiwać
 RX. Chcesz wysłać coś po TX i dostać odpowiedź.
 
 \subsection{MMS3 a główny komputer ModuCard}
-MMS3 komunikuje się z komputerem pokładowym ModuCarda po CAN w ChainLink i można go programować po nim też.
+MMS3 komunikuje się z komputerem pokładowym ModuCarda po ChainLink.
 \subsubsection{CAN}
-Są 2 linie CAN. Jakoś to gada. Problem programisty. Jak jesteś programistą, to masz problem.
+Są 2 linie CAN w ChainLink. Jakoś to gada. Problem programisty. Jak jesteś programistą, to masz problem.
 % /#\#/\/#\ Trzeba coś tu dopisać
+\subsubsection{USB}
+Jest 1 linia USB. Można się nią podłączyć do MMS3 i go programować po niej.
 
 \subsection{Programowanie i debugowanie}
 Więc hata da się debugować po USB-C.
@@ -983,7 +993,7 @@ Parę jeszcze rzeczy jest napisane w README template'a.
   \item Do generowania pliku BOM (Bill of materials) \url{https://github.com/openscopeproject/InteractiveHtmlBom}
   \item Do generowania plików produkcyjnych (tzw. gerber) \url{https://github.com/Bouni/kicad-jlcpcb-tools}
   \item Do pobierania footprint'ów komponentów z LCSC \url{https://github.com/uPesy/easyeda2kicad.py}
-  \item I jeszcze jego \url{https://github.com/CDFER/JLCPCB-Kicad-Library}
+  \item Biblioteka podstawowych komponentów z JLCPCB assembly: \url{https://github.com/CDFER/JLCPCB-Kicad-Library}
 \end{itemize}
 
 \subsection{Jak robić schematic/PCB}
@@ -1007,7 +1017,8 @@ Dobre, to znaczy z kategorii PCM\_JLCPCB.
 
 Staraj się wybierać, jak możesz, komponenty "Basic Component". Za każdy inny komponent trzeba zapłacić dodatkowo 1.5\$ za załadowanie
 do maszyny pick and place. Zazwyczaj basic będą tylko podstawowe rezystory, kondensatory, diody (w tym LED), oscylatory i parę innych. Pełną listę możesz
-znaleźć, wchodząc na stronę \url{https://jlcpcb.com/parts} i odfiltrować tylko te basic.
+znaleźć, wchodząc na stronę \url{https://jlcpcb.com/parts} i odfiltrować tylko te basic. Najprawdopodobniej lutowane będą tylko te basic
+więc im więcej takich użyjesz tym mniej zabawy potem z kupowaniem i lutowaniem części.
 
 Jak nie ma rezystora, którego potrzebujesz, to możesz połączyć 2/3 ze sobą. KiCad ma wbudowany do tego kalkulator.
 
