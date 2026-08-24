@@ -714,6 +714,16 @@ Polecam dać ekspander GPIO po I2C albo zaimplementować expander na CH32V003, b
 UART. Pamiętaj, że podpinasz się do hatów tylko na chwilę, więc nie możesz cały czas nasłuchiwać
 RX. Chcesz wysłać coś po TX i dostać odpowiedź.
 
+Oh, i ja już się pomyliłem i zamieniłem TX z RX. Tak to ma wyglądać:
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{photos/MMS3_Uart_Flip_Situation.png}
+  \caption{Gdzie jest TX i RX}
+  %\label{fig:NoLabel}
+\end{figure}
+
+
+
 \subsection{MMS3 a główny komputer ModuCard}
 MMS3 komunikuje się z komputerem pokładowym ModuCarda po ChainLink.
 \subsubsection{CAN}
