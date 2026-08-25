@@ -524,6 +524,11 @@ z poziomu komputera pokładowego dużego ModuCarda)
 To, i jak tak ci bardziej odpowiada, to możesz użyć MCU bez dużego ModuCarda i CAN-a, żeby mieć
 mikrokontroler z masą gotowych i obkodzonych kart rozszerzeń.
 
+\subsubsection{I ważne, MMS można seamless podłączyć z Duży moducard -> \ref{karta_adapter}}
+
+\subsubsection{Oh, i to może cie też interesować}
+Kiedy którego użyć -> \ref{Kiedy_ktorego_uzyc}
+
 \section{MiniModuCard - Kontroler}
 
 Kontroler MiniModuCarda to główna płytka tego systemu. Ona steruje hatami oraz raportuje do dużego ModuCarda.
@@ -1093,16 +1098,18 @@ A więc, procedura, której ja używam, wygląda tak:
 
 \subsection{Dodatkowe źródła do obczajenia}
 
-\subsubsection{Spoko miejsca do znalezienia układu i dokumentacji}
+\subsubsection{Spoko miejsca do znalezienia układu/dokumentacji/layoutu}
 \begin{itemize}
   \item Moduły do Arduino
   \item \url{https://www.mikroe.com}
+  \item DevBoard'y producenta
 \end{itemize}
 
 \subsubsection{Spoko filmy/źródła o projektowaniu schematic'ów/PCB}
 \begin{itemize}
   \item \url{https://www.youtube.com/@PhilsLab}
   \item \url{https://blog.poly.nomial.co.uk/2025-08-10-creating-high-quality-electronics-schematics.html}
+  \item GreatScott na yt -> tłumaczy od podstaw w prosty sposób
 \end{itemize}
 
 \subsubsection{Na zakończenie}
@@ -1288,32 +1295,107 @@ Jest podobne do WCH Link-E.
 
 
 \section{Duży ModuCard - Zasada działania}
+\subsection{Overview}
+Bazą dużego ModuCard'a jest backplane - duża płytka pcb z miejscami na karty. Do niego montuje się karty które już faktycznie coś robią.
+
+Karty komunikują się ze sobą po 2x CAN, 2x strobe + mają jeszcze podłączenie USB do karty komputera pokładowego. Do tego garść GPIO i troche pinów konfiguracji.
+
+Dalej, są same karty. Na nich jest cała faktyczna elektronika którą
+potrzebuesz - mikroprocesory, czujniki, komputery, zasilacze etc.
+
+Są 3x typy kart
+
+1. Karta komputer pokładowy -> Np. Rasperry Pi 5 czy jakiś minikomputer Jetson. Do niego raportują karty, on przetważa i wysterowywuje odpowiednio kartami 
+
+2. Karta zasilacz -> przejściówka z baterii lub 230V na +48V które zasila cały system
+
+3. Karta użytkowa -> Normalna karta która coś robi, np. Karta Nawigacji, Karta przekaźników etc
+
+Dla kompletnego systemu potrzebujesz
+
+1x Karte komputera pokładowego - wsadszasz ją w pierwszy slot backplane'a
+
+1 lub więcej Karte zasilacza - wsadasz w dowolny slot
+
+I ile ci się zmieści kart użytkowych - dowolny slot
+
+\subsubsection{ModuCard - Karta}
+Karta to nazwa na płytke z faktyczną elektroniką. Jedna karta to jednen cały kompletny system - Mikrokontroler i peryferia. Zwykłe karty Raportują po CAN i USB do Karty komputera pokładowego który steruje systemem. Więcej w sekcjach niżej
+
+\subsubsection{ModuCard - Backplane}
+Backplane to duża płytka z kilkoma (np. 6) slotami na karte. Można je łączyć szeregowo ze sobą (czyli połączyć 2x backplane'y 6slot i uzyskać jeden duży backplane 12slot). 
+
+Basically możesz o nim myśleć jako dużym USB hub'ie gdzie wpinasz karty jak pendrive'y.
+\subsubsection{I ważne, Duży moducard można seamless podłączyć z MMS -> \ref{karta_adapter}}
+\subsubsection{Oh, i to może cie też interesować}
+Kiedy którego użyć -> \ref{Kiedy_ktorego_uzyc}
+
 \section{Duży ModuCard - Typy Kart}
+\subsection{Karta Gateway (Komputer pokładowy)}
+Pierwsza (as in: trzeba ją włożyć do pierwszego slot'u backplane'a. Reszta kart obojętnie) i najważniejsza karta w systemie. To ona steruje wszystkim.
+
+Jest na niej jakiś minikomputer, Np. raspberry Pi, Nvidia Jetson czy to tam potrzebujesz. On odczytuje raporty od kart po Can'ie, rozmawia z nimi po USB i przetważa te dane.
+
+Możesz go zaprogramować jako
+1. Komputer pokładowy - no, komputer pokładowy. Przetważa dane i tak jak pisałem
+2. Gateway - Odczytuje dane z kart i wysyła po ethernecie do innnego, dużego komputera np. stacjonarnego z mocnym procem i GPU. Wtedy komputer pokładowy robi jako fancy przetwornik ETH <-> CAN.
+
+Wymiennie będę nazywał tą karte jako komputer pokładowy i gateway.
+\subsection{Karta Zasilacza}
+Dostaje zewnętrzne zasilanie i przetwarza je na zasilanie +48V na głównej szynie zasilania moducarda i co tam potrzeba. Możesz go zrobić żeby dostawał zasialnie z baterii jak nomad, z zasilacza ATX jak Hefajstos czy z 230V.
+
+Obsługuje sekwencjonowanie zasilania czyli odpalanie po kolei poszczegółnych szyn i raportowanie ich stanu do komputera pokładowego
+\subsection{Karta użytkowa}
+I karta najbliższa twojemu sercu (chyba że jesteś programistą ROS'a) czyli karta użytkowa. Na niej jest ten cały ambaras. No to lecimy
+
+Na niej jest przetworka 48V -> 5V czy inne szyny które są potrzebne dla embedded.
+
+Masz na niej mikrokontroler który gada po CAN i USB oraz używa reszty GPIO do interakcji z\dots
+
+Samymi peryferiami -> konwertery ADC, sterowniki, czujniki i wszystko
+
 \section{Duży ModuCard - Rola Backplane'a}
+
+Są na nim wbudowane USB hub'y żeby komputer pokładowy mógł komunikować się z każdą kartą.
+
+Przenosi zasilanie też. Can też. USB i strobe też.
+
+Powiedz o GPIO konfiguracyjnych i GPIO L R
+
+Nadal trzeba pamiętać żeby do pierwszego slotu dać komputer pokładowy
+
+\section{Do czego używać GPIO L/R}
+Do niczego lol. Rób dobre karty (jak widać dokumentacja dużego Dużego ModuCard'a jest WIP. Jak znowu będe jechał pociągiem to ją skończe ładnie)
+\section{Co to strobe}
+Strobe? Jaki strobe? John Strobe?
 \section{Duży ModuCard - Przykładowe Karty}
 \section{Duży ModuCard - Bilans Mocy}
-\section{Duży ModuCard - Wymagania dla Kart}
+\section{Duży ModuCard - Wymagania dla Kart użytkowych}
+\section{Duży ModuCard - Wymagania dla Kart zasilacza}
+\section{Duży ModuCard - Wymagania dla Kart komputera pokładowego}
 \section{Duży ModuCard - Wymagania dla Backplane'a}
 \section{Duży ModuCard - Projektowanie kart} \label{Duży ModuCard - Projektowanie kart}
 Sorka, To be done
 \section{Duży ModuCard - Pinout złączy}
 
 
+\section{Pomiędzy systemami - Duży moducard a mały, kiedy którego użyć} \label{Kiedy_ktorego_uzyc}
+Możesz mieć pytanie "Ej, te dwa systemy to praktycznie to samo" albo "Musze zrobić XXX, to potrzebuje dużego czy małego moducard". Ja o tym tak myśle
+
+Mały task - mały moducard. Duży task - duży moducard
 \section{Pomiędzy systemami - Karta adapter i ChainLink} \label{karta_adapter}
+Important section. Much writting.
 
 \chapter{Książka programisty}
 \section{Wstęp}
 Aktualnie nie mamy nic zaprogramowane. Powodzenia!
 \chapter{Książka mechaniczna}
 \section{Wymiary}
-Jeśli jesteś mechanikiem zespołu, to najlepszą metodą na złapanie wymiarów jest
-poproszenie elektronika, żeby wyeksportował ci PCB do .step razem z komponentami.
+Jeśli jesteś mechanikiem zespołu, to najlepszą metodą na złapanie wymiarów jest poproszenie elektronika, żeby wyeksportował ci PCB do .step razem z komponentami.
 
 Ta sekcja jest bardziej pod kątem utrzymania standardu.
 
-Wymiary do śrub montażowych albo keepout zone'ów (to jest miejsce, gdzie elektronik nie
-może stawiać komponentów i ty możesz tam sobie coś zamodelować do złapania hata) - są
-symetryczne, więc paru wymiarów nie podałem.
+Wymiary do śrub montażowych albo keepout zone'ów (to jest miejsce, gdzie elektronik nie może stawiać komponentów i ty możesz tam sobie coś zamodelować do złapania hata) - są symetryczne, więc paru wymiarów nie podałem.
 
 
 \subsection{Duży ModuCard}
