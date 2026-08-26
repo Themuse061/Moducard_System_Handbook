@@ -417,25 +417,22 @@ Duży ModuCard składa się z:
 \begin{itemize}
   \item Backplane'a, do którego wpięte są karty.
   \item Backplane podłącza zasilanie i komunikację do kart.
-  \item Komunikacja jest w postaci 2x CAN, 1x USB i 4x GPIO.
+  \item Komunikacja jest w postaci 2x CAN, 1x USB, 16x GPIO i 2x Strobe
   \item Są 3 typy kart:
-  \item 1. Karta "główny komputer" - steruje całym systemem (np. Raspberry Pi).
+  \item 1. Karta Komputer pokładowy - steruje całym systemem (np. Raspberry Pi).
   \item 2. Karta Zasilanie - zasila system, duh.
-  \item 3. Karta Użytkowa/Mikrokontrolerowa - na niej są rzeczy, które
-        faktycznie coś robią - kamery, radary i inne duże poważne rzeczy.
-  \item Duży ModuCard zwykle zajmuje się wysokim sterowaniem, ale może robić cokolwiek,
-        zależy jakie karty do niego włożysz.
+  \item 3. Karta Użytkowa - na niej są rzeczy, które faktycznie coś robią - kamery, radary i inne duże poważne rzeczy.
+  \item Duży ModuCard zwykle zajmuje się wysokim sterowaniem, ale może robić cokolwiek, zależy jakie karty do niego włożysz.
 \end{itemize}
 
 Teraz mały ModuCard. On składa się z:
 
 \begin{itemize}
   \item MMS3 MCU - Jedna płytka z mikrokontrolerem, który kontroluje haty.
-  \item Hatów - Do 8 płytek wykonawczych. Są np. sterownikiem silników,
-        przetwornikiem termopary etc.
+  \item Hatów - Do 8 płytek wykonawczych. Są np. sterownikiem silników, przetwornikiem termopary etc.
   \item (myśl o hatach jak o shieldach do Arduino, ale można ich dać aż 8).
   \item MCU i haty komunikują się po SPI, I2C i UART takim dużym złączem goldpin z dwoma rzędami.
-  \item MCU ma złącze ChainLink (złączka RJ45, ta ethernet), na którym jest USB i 2x CAN.
+  \item MCU ma złącze ChainLink (złączka RJ45, ta ethernet), na którym jest USB i 2x CAN
 \end{itemize}
 
 I teraz ważne: to złącze ChainLink MMS3 z 2x CAN i USB można podłączyć
@@ -469,13 +466,17 @@ Jest dużo różnych protokołów, płytek i wgl. Tu jest lista:
   \item ChainBus -> magistrala komunikacyjna między kontrolerem a hatami.
   \item Karta ModuCard:
         \begin{itemize}
-          \item Karta CPU.
-          \item Karta PSU.
-          \item Karta Mikrokontrolerowa/Użytkowa.
+          \item Karta Komputera pokładowego / Gateway (to samo)
+          \item Karta Zasilacza.
+          \item Karta Użytkowa/Mikrokontrolerowa (to samo).
         \end{itemize}
   \item MCU - Mikrokontroler.
-  \item Wieża, drzewko MMS -> 1 lub więcej hatów połączonych z Kontrolerem MiniModuCard.
+  \item Wieża, drzewko MMS3 -> 1 lub więcej hatów połączonych z Kontrolerem MiniModuCard.
   \item Sznurek/gałąź MMS3 -> kilka MMS3 podłączonych ze sobą po ChainLink.
+  \item IC - Integrated Circuit, układ zinetgrowany. Cokolwiek co jest małym czarnym boxem z nóżkami i lutujesz na PCB
+  \item PCB - Printed circuit board. Taka zielona płytka drukowana na której jest elekotrnika
+  \item Zielony - Kolor definowany jako światło o długości fali 550nm
+  \item Fala - Okay starczy mi. Takie na morzu co się rusza i jest z wody.
 \end{itemize}
 
 \chapter{Książka elektroniczna}
@@ -719,6 +720,8 @@ Polecam dać ekspander GPIO po I2C albo zaimplementować expander na CH32V003, b
 UART. Pamiętaj, że podpinasz się do hatów tylko na chwilę, więc nie możesz cały czas nasłuchiwać
 RX. Chcesz wysłać coś po TX i dostać odpowiedź.
 
+To, albo dać jakiś MCU (CH32V003) na hat'a który przetłumaczy z UART na SPI albo I2C.
+
 Oh, i ja już się pomyliłem i zamieniłem TX z RX. Tak to ma wyglądać:
 \begin{figure}[H]
   \centering
@@ -780,7 +783,7 @@ I dalej, możesz na tę samą płytkę dać samego MMS3 i mieć cały projekt na
 Zaleta od zaczęcia tak zaraz zamiast skipnięcia od razu do 1 PCB jest taka, że możesz wszystko stopniowo testować, łatwo modyfikować i
 tanio prototypować.
 
-W kole nie używamy ani AltMode, ani stopniów integracji projektu 2 i 3.
+W kole nie używamy ani AltMode, ani stopniów integracji projektu 2 i 3. (At least for now)
 
 \subsubsection{Stopnie integracji}
 \begin{itemize}
@@ -788,6 +791,20 @@ W kole nie używamy ani AltMode, ani stopniów integracji projektu 2 i 3.
   \item Stopień 2 - MMS3 + 1 hat AltMode.
   \item Stopień 3 - Wszystko na tym samym PCB.
 \end{itemize}
+
+To jest pierwszy wątek, w praniu jeszcze wyszedł drugi wątek: co jak programista bardzo krzyczy że potrzebuje interruptów a w chainbus'ie nie ma interruptów?
+
+Oto kolejność postępowania
+
+1. Powiedz mu że ma skill issue i że to da rade zaprogramować bez nich na polling
+
+2. Możesz dać jakiś MCU na hat'a który obsłuży twój układ z interruptami i przekaże te dane do głównego proca MMS3
+
+3. Zastanów się czy nie lepiej zrobić to na Karcie dużego ModuCard'a
+
+4. Możesz zrobić hat'a altmode. Czyli nie używasz chainbus'a i wykorzystujesz piny MMS3 jako GPIO. Robisz jedną płytke która wpina się do wszystkich trzech rzędów MMS'a. Wtedy masz jedną płytke na jednego MMS3, bez chainbus'a ale masz interrupty and all that jazz. 
+
+Spoko w czwartej opcji jest że możesz podłączyć kilka MMS3 ze sobą i na jednym mieć altmode'a bo go bardzo potrzebujesz a na reszcie chainbus. One gadają po CAN więc jest git.
 
 \section{MiniModuCard - Przykładowe MMS-y i haty}
 \subsection{MMS3}
@@ -912,12 +929,9 @@ Tbh większość z tego jest już na templatce:
 \section{MiniModuCard - Projektowanie hatów} \label{MiniModuCard - Projektowanie hatów}
 \subsection{Co musisz zrobić}
 
-Jeśli tu jesteś, to znaczy, że ktoś cię poprosił o zrobienie Hat'a do MiniModuCard'a.
-W tej książce jest cała dokumentacja systemu, ale postaram się streścić najważniejsze
-rzeczy, które musisz wiedzieć tutaj.
+Jeśli tu jesteś, to znaczy, że ktoś cię poprosił o zrobienie Hat'a do MiniModuCard'a. W tej książce jest cała dokumentacja systemu, ale postaram się streścić najważniejsze rzeczy, które musisz wiedzieć tutaj.
 
-Zakładam, że dostałeś zadanie w stylu "zrób hat'a, który odbiera GPS", "który
-steruje silnikiem BLDC" albo "zrób hata z układem scalonym DRV17182". Jeśli się zgadza, to
+Zakładam, że dostałeś zadanie w stylu "zrób hat'a, który odbiera GPS", "który steruje silnikiem BLDC" albo "zrób hata z układem scalonym DRV17182". Jeśli się zgadza, to
 możesz czytać dalej.
 
 \subsection{Co musisz wiedzieć}
@@ -938,21 +952,16 @@ Inaczej mówiąc, hat to tak jakby shield na Arduino.
 
 \subsubsection{Jak to działa}
 
-Procesor ma swoje piny (to, co podpinasz Arduino do modułów). One zmieniają swoje napięcia i sterują rzeczami
-wyprowadzonymi na złącze ChainBus. Złącze ma konkretne
-rzeczy na konkretnych pinach, żeby było
+Procesor ma swoje piny (to, co podpinasz Arduino do modułów). One zmieniają swoje napięcia i sterują rzeczami wyprowadzonymi na złącze ChainBus. Złącze ma konkretne rzeczy na konkretnych pinach, żeby było
 łatwo wymieniać i projektować hat'y.
 
 Te konkretne rzeczy na konkretnych pinach to I2C, SPI i UART. To są takie mega
 często stosowane protokoły komunikacyjne. Ich będziesz używać do sterowania układami scalonymi (IC)
 na hat'ie.
 
-Twoje zadanie to znaleźć układ, który robi to, co chcesz (np. sterownik termopary) taki, żeby komunikował
-się po I2C, SPI albo UART, a nie jakimś dziwnym własnym protokołem. Jak już znajdziesz, to zapytaj się
-osoby, od której dostałeś zadanie, czy będzie pasował.
+Twoje zadanie to znaleźć układ, który robi to, co chcesz (np. sterownik termopary) taki, żeby komunikował się po I2C, SPI albo UART, a nie jakimś dziwnym własnym protokołem. Jak już znajdziesz, to zapytaj się osoby, od której dostałeś zadanie, czy będzie pasował.
 
-Jak masz ten układ wybrany, to musisz narysować w programie "KiCad", do czego jest podłączony. To jest schematic. Potem
-przenosisz go na fizyczną płytkę w tym samym programie. Wtedy masz PCB.
+Jak masz ten układ wybrany, to musisz narysować w programie "KiCad", do czego jest podłączony. To jest schematic. Potem przenosisz go na fizyczną płytkę w tym samym programie. Wtedy masz PCB.
 
 (Jeszcze jest system automatycznego wybierania Hat'ów przez piny ADDR, ale nie musisz się
 o nim martwić, bo już jest na templatce).
@@ -984,7 +993,7 @@ Tak wygląda otworzony w programie KiCad (musisz wejść w widok schematu/płytk
 \subsubsection{Noteworthy rzeczy o templatce}
 \begin{itemize}
   \item Masz już zrobione złącze ChainBus, adresowanie i resztę
-  \item Nie możesz rzucać Interboard connector, Bus switch, ID eeprom na schematic'u. One muszą zostać takie, jakie są
+  \item Nie możesz rucszać Interboard connector, Bus switch, ID eeprom na schematic'u. One muszą zostać takie, jakie są
   \item Nie zmieniaj rozmiaru płytki PCB i nie ruszaj rozstawu śrub montażowych oraz złącz ChainBus.
   \item Możesz usunąć ze schematic'a i PCB złącze XT60, jeśli go nie potrzebujesz (ono jest, jak potrzebujesz dużo prądu)
   \item Na schematic'u możesz się podpiąć do I2C, SPI i UART, jak wychodzą z tej ramki, za bus switchem. Nie ruszaj nic w środku ramki
@@ -1184,8 +1193,8 @@ bezpośrednio z dolnej do górnej, a ADDR idą z przeplotem.
     19           & GND             & 20           & ChainBus SCL    \\
     21           & GND             & 22           & ChainBus CS     \\
     23           & GND             & 24           & ChainBus SCK    \\
-    25           & Pin\_25         & 26           & ChainBus MOSI   \\
-    27           & Pin\_27         & 28           & ChainBus MISO   \\
+    25           & Reserved         & 26           & ChainBus MOSI   \\
+    27           & Reserved         & 28           & ChainBus MISO   \\
     29           & +12V stby       & 30           & ChainBus TX     \\
     31           & GND             & 32           & ChainBus RX     \\ \bottomrule
   \end{tabular}
@@ -1210,12 +1219,14 @@ bezpośrednio z dolnej do górnej, a ADDR idą z przeplotem.
     19           & GND             & 20           & ChainBus SCL    \\
     21           & GND             & 22           & ChainBus CS     \\
     23           & GND             & 24           & ChainBus SCK    \\
-    25           & Pin\_25         & 26           & ChainBus MOSI   \\
-    27           & Pin\_27         & 28           & ChainBus MISO   \\
+    25           & Reserved         & 26           & ChainBus MOSI   \\
+    27           & Reserved        & 28           & ChainBus MISO   \\
     29           & +12V stby       & 30           & ChainBus TX     \\
     31           & GND             & 32           & ChainBus RX     \\ \bottomrule
   \end{tabular}
 \end{table}
+
+No, ale z TX RX uważaj (;
 
 \subsection{ChainLink}
 2x są na każdym MMS3 i są na kartach adapter.
@@ -1296,80 +1307,98 @@ Jest podobne do WCH Link-E.
 
 \section{Duży ModuCard - Zasada działania}
 \subsection{Overview}
-Bazą dużego ModuCard'a jest backplane - duża płytka pcb z miejscami na karty. Do niego montuje się karty które już faktycznie coś robią.
+Bazą dużego ModuCard'a jest backplane - duża płytka pcb z ze złaczami na karty. Do niego wpina się karty ModuCard. System podobny do Eurocard'a albo PCI w komputerach.
 
-Karty komunikują się ze sobą po 2x CAN, 2x strobe + mają jeszcze podłączenie USB do karty komputera pokładowego. Do tego garść GPIO i troche pinów konfiguracji.
+Do kart jest podłączone 2xCan, USB i pare innych rzeczy
 
-Dalej, są same karty. Na nich jest cała faktyczna elektronika którą
-potrzebuesz - mikroprocesory, czujniki, komputery, zasilacze etc.
+Dalej, karty. Na nich jest cała faktyczna elektronika którą potrzebuesz - mikroprocesory, czujniki, komputery, zasilacze etc. Każda karta to kompletny system ze swoim MCU i wszystkim.
 
 Są 3x typy kart
 
-1. Karta komputer pokładowy -> Np. Rasperry Pi 5 czy jakiś minikomputer Jetson. Do niego raportują karty, on przetważa i wysterowywuje odpowiednio kartami 
+1. Karta komputer pokładowy -> Np. Rasperry Pi 5 czy jakiś minikomputer Jetson. Do niego raportuje reszta kart, on przetważa te dane i zwraca kartą co mają robić
 
 2. Karta zasilacz -> przejściówka z baterii lub 230V na +48V które zasila cały system
 
 3. Karta użytkowa -> Normalna karta która coś robi, np. Karta Nawigacji, Karta przekaźników etc
 
-Dla kompletnego systemu potrzebujesz
+Dla kompletnego systemu potrzebujesz 1x Karte komputera pokładowego. 1 lub więcej Karte zasilacza i ile ci się zmieści kart użytkowych 
 
-1x Karte komputera pokładowego - wsadszasz ją w pierwszy slot backplane'a
-
-1 lub więcej Karte zasilacza - wsadasz w dowolny slot
-
-I ile ci się zmieści kart użytkowych - dowolny slot
-
-\subsubsection{ModuCard - Karta}
-Karta to nazwa na płytke z faktyczną elektroniką. Jedna karta to jednen cały kompletny system - Mikrokontroler i peryferia. Zwykłe karty Raportują po CAN i USB do Karty komputera pokładowego który steruje systemem. Więcej w sekcjach niżej
-
-\subsubsection{ModuCard - Backplane}
-Backplane to duża płytka z kilkoma (np. 6) slotami na karte. Można je łączyć szeregowo ze sobą (czyli połączyć 2x backplane'y 6slot i uzyskać jeden duży backplane 12slot). 
-
-Basically możesz o nim myśleć jako dużym USB hub'ie gdzie wpinasz karty jak pendrive'y.
 \subsubsection{I ważne, Duży moducard można seamless podłączyć z MMS -> \ref{karta_adapter}}
 \subsubsection{Oh, i to może cie też interesować}
 Kiedy którego użyć -> \ref{Kiedy_ktorego_uzyc}
 
+\section{Duży ModuCard - Backplane}
+Szkielet całego ModuCard'a -> do niego wpinasz karty
+
+% /#\#/\/#\ Zdjęcie pliska
+
+Backplane przekazuje między kartami
+\begin{itemize}
+  \item 2x CAN
+  \item 1x USB na karte. podłączone do komputera pokładowego
+  \item 2x Strobe (o nich w \ref{Duży ModuCard - Strobe})
+  \item 16x GPIO (o nich w \ref{Duży ModuCard -  GPIO})
+  \item Zasilanie 48V (ile mocy/karte masz w \ref{Duży ModuCard - Bilans Mocy})
+  \item I troche pinów konfiguracyjnych
+\end{itemize}
+
+USB jest podłączone przez hub'a USB wbudowanego w backplane'a.
+
+Na całego backplane'a możesz dać tylko jeden komputer pokładowy, musi być w slot'ie pierwszym.
+
+Backplane'y można łączyć ze sobą żeby je przedłużyć. Np. dwa backplane'y 6x można połączyć w jednego 12x. Oh i pamiętaj że komputer pokładowy musi być w slot'ie pierwszym pierwszego backplane'a
+
+Co do pinów konfiguracyjnych, to don't worry about them (:
+
+% /#\#/\/#\ Jak będziemy mieli piny konfiguracyjne to je opisze (;
+
 \section{Duży ModuCard - Typy Kart}
 \subsection{Karta Gateway (Komputer pokładowy)}
-Pierwsza (as in: trzeba ją włożyć do pierwszego slot'u backplane'a. Reszta kart obojętnie) i najważniejsza karta w systemie. To ona steruje wszystkim.
+Pierwsza i najważniejsza karta w systemie. To ona steruje wszystkim.
 
-Jest na niej jakiś minikomputer, Np. raspberry Pi, Nvidia Jetson czy to tam potrzebujesz. On odczytuje raporty od kart po Can'ie, rozmawia z nimi po USB i przetważa te dane.
+Jest na niej minikomputer, Np. raspberry Pi, Nvidia Jetson czy to tam potrzebujesz. On rozmawia z kartami po USB i CAN, przetważa te dane i wysyła kartą co mają robić. Pewnie jest na nim ROS (Robotic Operating System)
 
 Możesz go zaprogramować jako
-1. Komputer pokładowy - no, komputer pokładowy. Przetważa dane i tak jak pisałem
-2. Gateway - Odczytuje dane z kart i wysyła po ethernecie do innnego, dużego komputera np. stacjonarnego z mocnym procem i GPU. Wtedy komputer pokładowy robi jako fancy przetwornik ETH <-> CAN.
+1. Komputer pokładowy - no, komputer pokładowy. Niezależna jednostka która steruje całym robotem.
+2. Gateway - Jeśli potrzebujesz mega dużo mocy obliczeniowej to zamiast robić jakiś porąbanie mocny komputer pokładowy i przetważać te dane w robocie, to wysyłasz dane po np. Ethernecie poza robota, tam to przetważasz i odsyłasz spowrotem do robota. Wtedy karta komputera pokładowego robi jako gateway do innego, większego komputera
 
 Wymiennie będę nazywał tą karte jako komputer pokładowy i gateway.
+
 \subsection{Karta Zasilacza}
 Dostaje zewnętrzne zasilanie i przetwarza je na zasilanie +48V na głównej szynie zasilania moducarda i co tam potrzeba. Możesz go zrobić żeby dostawał zasialnie z baterii jak nomad, z zasilacza ATX jak Hefajstos czy z 230V.
 
-Obsługuje sekwencjonowanie zasilania czyli odpalanie po kolei poszczegółnych szyn i raportowanie ich stanu do komputera pokładowego
+Obsługuje (as in: powinna obsługiwać) sekwencjonowanie zasilania czyli odpalanie po kolei poszczegółnych szyn i raportowanie ich stanu do komputera pokładowego
+
+Jaką chcemy sekwencje mieć, to trzeba jeszcze wymyślić albo ukraść z MMS2
+
 \subsection{Karta użytkowa}
-I karta najbliższa twojemu sercu (chyba że jesteś programistą ROS'a) czyli karta użytkowa. Na niej jest ten cały ambaras. No to lecimy
+I karta najbliższa twojemu sercu (chyba że jesteś programistą ROS'a) czyli karta użytkowa.
 
-Na niej jest przetworka 48V -> 5V czy inne szyny które są potrzebne dla embedded.
+Na karcie użytkowej implementujesz to co potrzebujesz - IC do GPS, enkodera, przekaźniki whatever. Do tego jakieś MCU i na piwo
 
-Masz na niej mikrokontroler który gada po CAN i USB oraz używa reszty GPIO do interakcji z\dots
+MCU jest podłączone przez Backplane'a do Komputera pokładowego. Raportuje mu tam co i jak.
 
-Samymi peryferiami -> konwertery ADC, sterowniki, czujniki i wszystko
+No i tyle. cała sztuka. To jest basic bitch embedded system, tylko na standardowym PCB i ma CAN'a.
 
-\section{Duży ModuCard - Rola Backplane'a}
+No i ofc potrzebujesz przetworki 48V -> 5V or whatever floats your boat.
 
-Są na nim wbudowane USB hub'y żeby komputer pokładowy mógł komunikować się z każdą kartą.
 
-Przenosi zasilanie też. Can też. USB i strobe też.
+\section{Do czego używać GPIO L/R} \label{Duży ModuCard -  GPIO}
+Każda karta ma 16 GPIO wyprowadzonych do komunikowania się z kartami obok. Możesz ich używać do
+\begin{itemize}
+  \item Do niczego - Najlepsza opcja, każda karta jest niezależna i może ją wpiąć gdzie chcesz i się nie martwić o nic. Jeśli możesz to tak zrób
+  \item Jeśli jakoś absolutnie brakuje ci miejsca na PCB i nie możesz tego rozbić na niezależne karty, to możesz podzielić to co robisz na dwie karty które komunikują się czy to cyfrowo czy analogowo czy jakieś interrupty przez GPIO L/R. Jak możesz to zrób dwie niezależne karty, i dopiero jak się tak nie da to zrób z komunikacją przez GPIO.
+  \item Jest 16 GPIO, i wiesz co ma też 16 GPIO? Chainbus. Możesz zrobić system MMS na dużym ModuCard'ie. Ale no, lepiej robić niezależne karty
+  \item Tak na prawde miedź to miedź, więc możesz na nich cokolwiek puścić. Use your own judgment and creativity
+\end{itemize}
 
-Powiedz o GPIO konfiguracyjnych i GPIO L R
+Long story short, nie przejmuj się nim
+\section{Co to strobe} \label{Duży ModuCard - Strobe}
+Strobe to para różnicowa do timingu. Gdybyś potrzebował dokładnie zsynchronizować jakieś wydarzenie na hat'ach to możesz wysłać na to trigger. Nigdzie tego jeszcze nie potrzebowaliśmy, jest jako futureproofing.
 
-Nadal trzeba pamiętać żeby do pierwszego slotu dać komputer pokładowy
-
-\section{Do czego używać GPIO L/R}
-Do niczego lol. Rób dobre karty (jak widać dokumentacja dużego Dużego ModuCard'a jest WIP. Jak znowu będe jechał pociągiem to ją skończe ładnie)
-\section{Co to strobe}
-Strobe? Jaki strobe? John Strobe?
+Long story short, nie przejmuj się nim
 \section{Duży ModuCard - Przykładowe Karty}
-\section{Duży ModuCard - Bilans Mocy}
+\section{Duży ModuCard - Bilans Mocy}\label{Duży ModuCard - Bilans Mocy}
 \section{Duży ModuCard - Wymagania dla Kart użytkowych}
 \section{Duży ModuCard - Wymagania dla Kart zasilacza}
 \section{Duży ModuCard - Wymagania dla Kart komputera pokładowego}
@@ -1378,24 +1407,61 @@ Strobe? Jaki strobe? John Strobe?
 Sorka, To be done
 \section{Duży ModuCard - Pinout złączy}
 
+\section{Pomiędzy systemami - Karta adapter i ChainLink} \label{karta_adapter}
+\subsection{Karta Adapter}
+Przez Backplane ModuCard'a głównym protokołem komunikacji jest CAN. To na nim hat'y wysyłają informacje do Komputera pokładowego.
+
+Karta adapter bierze tego CAN'a oraz USB i wystawia je na złączke RJ45 (ta sama co ethernet jest). I teraz, do tego możesz podłączyć MMS3.
+
+I to jest tak, że MMS3 ma dostęp do całej komunikacji jakie mają karty na Backplane'ie.
+
+Tego Can'a, USB (i +12V) na RJ45 nazywamy ChainLink. Oh, i chyba pinoutowo to jest kompatybilne albo z VESC albo z BetaFlight
+
+I jeszcze karta adapter może sekwencjonować zasilanie MMS3. Czyli po kolei włączać kolejne wiązki i sprawdzać czy gdzieś jest zwaracie zasilania, ale to TBD jest.
+
+\subsection{Łączenie systemów}
+Okay, gadamy sobie o dwóch różnych systemach - MiniModuCard i ModuCard. Ale one podobno są "połączone" ze sobą. Trik jest taki
+
+Karta komputera pokładowego steruje całym systemem. Tak na prawde jeśli coś może do niej gadać, to jest kompatybilne z ModuCard'em.
+
+Karty, proste - gadają z nią po CAN'ie i USB przez Backplane'a
+
+Teraz MMS, on jest podłączony po CAN'ie, przez karte adapter do Komputera . Z punktu widzenia komputera nie ma różnicy czy coś jest mówi do niego MMS3 czy jakaś Karta, komunikacja jest taka sama
+
+I to tyle.
+
+Jeszcze inny trik jest taki staram się dawać takie same MCU (STM32F305) i na karty, i na MMS3 więc programować się je będzie tak samo. Łatwo będzie przeportować stack can'a z jednego na drugie oraz jak zaprogramujesz jedno to od razu potrafisz drugie.
 
 \section{Pomiędzy systemami - Duży moducard a mały, kiedy którego użyć} \label{Kiedy_ktorego_uzyc}
 Możesz mieć pytanie "Ej, te dwa systemy to praktycznie to samo" albo "Musze zrobić XXX, to potrzebuje dużego czy małego moducard". Ja o tym tak myśle
 
-Mały task - mały moducard. Duży task - duży moducard
-\section{Pomiędzy systemami - Karta adapter i ChainLink} \label{karta_adapter}
-Important section. Much writting.
+% /#\#/\/#\ Tutaj coś dopisze jak zrobie pare kart i zobacze z czym to się je
+
+Mały task - mały moducard. Duży task - moducard nie musi być duży, ale tak się łatwiej projektuje
+% Mały rysunek, mała wiedza. Duży rysunek - więdza może i nie jest duża, ale przynajmniej jest czytelnie - Jacek Świniarski, mój ulubiony zawodowiec z technikum
 
 \chapter{Książka programisty}
 \section{Wstęp}
 Aktualnie nie mamy nic zaprogramowane. Powodzenia!
+
+Update: Chyba używamy Zephyr'a
 \chapter{Książka mechaniczna}
+\section{Gotowe rozwiązania}
+Siemka, jak nie chce ci się projektować, to możesz zakosić jeden z tych sposobów na który już mocowaliśmy ModuCard'a
+\subsection{MMS -> Szyna DIN}
+To Do
+% /#\#/\/#\ To Do
+\subsection{ModuCard -> Bojowe zadanie}
+Jest 60\% szansy że ModuCard jest natywnie kompatybilny z EuroCard'em. Weź sprawdź czy faktycznie jest i mi napisz pliska <3
+\subsection{ModuCard -> Nic nie ma jeszcze}
+W sensie nomad coś montował, ale tbh nie wiem. Oni mieli jeszcze ModuCard2 a tu gadamy o ModuCard3, ale powinno być kompatybilne\dots
+
 \section{Wymiary}
-Jeśli jesteś mechanikiem zespołu, to najlepszą metodą na złapanie wymiarów jest poproszenie elektronika, żeby wyeksportował ci PCB do .step razem z komponentami.
+Najlepszą metodą na złapanie wymiarów jest poproszenie elektronika, żeby wyeksportował ci PCB do .step razem z komponentami i wbicie tego do twojego CAD'a
 
 Ta sekcja jest bardziej pod kątem utrzymania standardu.
 
-Wymiary do śrub montażowych albo keepout zone'ów (to jest miejsce, gdzie elektronik nie może stawiać komponentów i ty możesz tam sobie coś zamodelować do złapania hata) - są symetryczne, więc paru wymiarów nie podałem.
+Wymiary do śrub montażowych albo keepout zone'ów (to jest miejsce, gdzie elektronik nie może stawiać komponentów i ty możesz tam sobie coś zamodelować do zamocowania hata) - są symetryczne, więc paru wymiarów nie podałem.
 
 
 \subsection{Duży ModuCard}
@@ -1403,7 +1469,7 @@ To Do
 \subsection{MiniModuCard - MMS3 (Mikrokontroler)}
 To Do
 \subsection{MiniModuCard - Hat}
-Odległość między hatem a hatem albo MMS3 a hatem to 1 złącze goldpin SMD męskie + wpięte w nie SMD żeńskie.
+Odległość między hatem a hatem albo MMS3 a hatem to 1 złącze goldpin SMD męskie + wpięte w nie SMD żeńskie. To chyba jakieś 25.4 mm czy tam 1 cal ale weź to jeszcze sprawdź bo z głowy to pisze.
 \begin{figure}[!h]
   \centering
   \includegraphics[width=0.8\textwidth]{photos/MMS_Hat_Dimensions_1.png}
@@ -1441,7 +1507,12 @@ Okay, jako że to jest mój fork to sobie zapisze notatki co do rozwoju systemu
   \item każdy projekt na githubie musi mieć tag żeby dało rade go szukać sensownie
   \item programowanie musi być proste, KISS it or nobody will use it
   \item Trzeba porządnie usiąść do licencji prawnych. Hat'y mają jakieś, ale to temp solutions
+  \item Czy da rade zrobić interrupty na ChainBus? Pomysł jest taki: ADDRX pullup i hat może go sam pulnąć w dół jak coś się dzieje - zły pomysł
 \end{itemize}
 
 
 \end{document}
+
+
+% Możesz szukać tego
+% /#\#/\/#\ 
