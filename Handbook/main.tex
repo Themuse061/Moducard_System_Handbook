@@ -884,6 +884,7 @@ Tak wygląda otworzony w programie KiCad (musisz wejść w widok schematu/płytk
 \subsubsection{Noteworthy rzeczy o templatce}
 \begin{itemize}
   \item Masz już zrobione złącze ChainBus, adresowanie i resztę
+  \item Jedunie musisz dodać układ którego potrzebujesz, pasywki i złącza żeby to do czegoś podłączyć.
   \item Co potrzebujesz dodać na schematic'u, dodaj w środku "User area". Reszty nie dotykaj ale polecam sobie obejrzeć jak to działa.
   \item Okay, jedyną rzeczą którą możesz ruszyć jest "Power Connector". To jest złącze XT60 i możesz go usunąć ze schematic'a i PCB jeśli go nie potrzebujesz (ono służy do podlączenia więcej zasilania jak musisz mieć więcej prądu na VIN niż chainbus ci da)
   \item Nie zmieniaj rozmiaru płytki PCB i nie ruszaj rozstawu śrub montażowych oraz złącz ChainBus.
@@ -964,6 +965,7 @@ Oh, i nawet jak nie kupujesz komponentów od JLC/LCSC to I tak pobierz od nich s
   \item Jeśli szukasz układu scalonego i są tylko z własnym protokołem albo reszta jest droga, to możesz dać po drodze innego proca, np. CH32V003, który to przetłumaczy na I2C/SPI. Napisz do mnie albo innego ogarniętego elektronika, żeby ci to wytłumaczył
   \item Komponenty zamawiamy zwykle albo z TME, Mouser, może Digikey. TME jest preferowane, ale jest drogo i mało komponentów
   \item Jak nie ma rezystora, którego potrzebujesz, to możesz połączyć 2/3 ze sobą. KiCad ma wbudowany do tego kalkulator, szturchnij mnie to ci powiem co i jak (;
+  \item Od razu jak skończysz robić płytke, usiądź i zrób dokumentacje w readme. Zobacz jak inne wyglądają, hat meter\_source ma długą więc dobrze widać jaka ma być.
 
 \end{itemize}
 
