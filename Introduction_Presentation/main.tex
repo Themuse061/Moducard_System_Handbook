@@ -1,0 +1,117 @@
+\documentclass[10pt]{beamer}
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{carlito}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\usepackage{graphicx}
+\usepackage{booktabs}
+
+% Wszystkie zdjęcia (także tła szablonu NewPwr) leżą w photos/
+\graphicspath{{photos/}}
+
+%=============== Ustawienia szablonu ===============
+\usetheme[horizontal=true, hr=false]{NewPwr}
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \hspace{10pt}%
+    \begin{beamercolorbox}[wd=\paperwidth,ht=2.5ex,dp=1.125ex]{page number in head/foot}%
+      \usebeamerfont{page number in head/foot}\insertframenumber%
+    \end{beamercolorbox}%
+  }%
+  \vskip10pt%
+}
+\setbeamercolor{page number in head/foot}{fg=white}
+\setbeamerfont{page number in head/foot}{size=\Large}
+\setbeamertemplate{navigation symbols}{}
+
+%=============== Dane Tytułowe ===============
+\title[]{Tytuł prezentacji}
+\author[Koło Naukowe]{\textbf{} \\
+    Autor 1 \\
+    Autor 2}
+\date{\today}
+
+\begin{document}
+
+% --- Strona tytułowa ---
+\begin{frame}
+\titlepage
+\end{frame}
+
+% --- Plan prezentacji ---
+\begin{frame}{Plan prezentacji}
+    \begin{enumerate}
+        \item \textbf{Część 1} – opis
+        \item \textbf{Część 2} – opis
+        \item \textbf{Część 3} – opis
+    \end{enumerate}
+\end{frame}
+
+\section{Część 1}
+
+% --- Blok + zdjęcie ---
+\begin{frame}{Slajd z blokiem i zdjęciem}
+    \begin{block}{Nagłówek bloku}
+        Treść bloku.
+    \end{block}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.6\linewidth]{example-image}
+        \caption{Podpis zdjęcia}
+    \end{figure}
+\end{frame}
+
+% --- Dwie kolumny ---
+\begin{frame}{Slajd z dwiema kolumnami}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{Lewa kolumna}
+            \begin{itemize}
+                \item Punkt 1
+                \item Punkt 2
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \textbf{Prawa kolumna}
+            \includegraphics[width=\linewidth]{example-image}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- Tabela ---
+\begin{frame}{Slajd z tabelą}
+    \begin{table}
+        \centering
+        \begin{tabular}{lll}
+            \toprule
+            Kolumna 1 & Kolumna 2 & Kolumna 3 \\
+            \midrule
+            a & b & c \\
+            d & e & f \\
+            \bottomrule
+        \end{tabular}
+        \caption{Podpis tabeli}
+    \end{table}
+\end{frame}
+
+\section{Podsumowanie}
+
+\begin{frame}{Podsumowanie}
+    \begin{block}{Omówione zagadnienia}
+        \begin{itemize}
+            \item Punkt 1
+            \item Punkt 2
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}{Dziękuję za uwagę}
+    \begin{center}
+        \Huge \textbf{Pytania?}
+    \end{center}
+\end{frame}
+
+\end{document}
