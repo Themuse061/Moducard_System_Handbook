@@ -783,46 +783,65 @@ Tbh większość z tego jest już na templatce:
   \item Wymiary 100x50mm.
   \item Ma 6 otworów montażowych M2.5.
   \item Nie daje komponentów na keepout zone'ach (zob. sekcja mechaniczna).
-  \item I komponenty tylko z przodu, nie wyższe niż XXXmm. % /#\#/\/#\
-  \item Złącza XT60 są na długiej krawędzi.
-  \item Złącza wyjściowe są na długiej krawędzi.
-  \item Złącza wyjściowe mają raster 2.54mm i używamy JST-XH.
+  \item Komponenty są tylko z przodu, nie wyższe niż XXXmm bo kolejny hat musi się zmieścić. % /#\#/\/#\
+  \item Jeśli są, to złącza XT60 są na długiej dolnej krawędzi pierwsze po lewo
+  \item Złącza wyjściowe są na długiej dolnej krawędzi.
+  \item Złącza wyjściowe mają raster 2.54mm i używają JST-XH kiedy to możliwe.
   \item Zworki konfiguracyjne są na prawej krótkiej krawędzi.
-  \item Przyciski, LED-y też na prawej.
-  \item lol lewa jest wolna.
+  \item Przyciski, LED-y też są prawej.
+  \item Lewa krótka krawędz jest zostawiona wolna.
   \item Złącze ChainBus w dobrym miejscu, z góry female i z dołu male.
-  \item ChainBus przesuwa piny ADDR, reszty nie.
-  \item Obsługuje napięcie na BRD VIN do 48V.
-  \item Nie pobiera więcej prądu niż z budżetu mocy (kinda whatever).
-  \item Podłącza ChainBus tylko do SPI, I2C, UART i nie odwala nic dziwnego z nimi.
-  \item Nic dziwnego, między innymi sam nie zaczyna komunikacji, tylko grzecznie czeka na MMS3 aż zacznie gadać.
-  \item Podłącza magistralę tylko kiedy ADDR1 = LOW.
-  \item Ma EEPROM do identyfikacji po I2C o dobrym adresie i zgodnej komunikacji.
-  \item Ma złącze I2C (3V3, GND, SCL, SDA) na prawej krawędzi, żeby łatwo flashować EEPROM.
+  \item ChainBus przesuwa piny ADDR, a reszte sygnałów przekazuje po prostu.
+  \item Obsługuje napięcie na BRD VIN od 12V do 48V.
+  \item Nie pobiera więcej prądu niż z budżetu mocy.
+  \item Podłącza ChainBus tylko do SPI, I2C, UART i nie odwala nic dziwnego z nimi elektrycznie.
+  \item Nic dziwnego też programistycznie, między innymi sam nie zaczyna komunikacji, tylko grzecznie czeka na MMS3 aż zacznie gadać.
+  \item Podłącza magistralę tylko kiedy ADDR1 = LOW. (ADDR1 albo ADDR0, zależy jak zaczynasz liczyć)
+  \item Ma EEPROM do identyfikacji po I2C o dobrym adresie i zgodnej komunikacji z użytymi w reszcie hat'ów. 
+  %\item Ma złącze I2C (3V3, GND, SCL, SDA) na prawej krawędzi, żeby łatwo flashować EEPROM.
+  % Okay whatever z tym, flash'nij sobie ChainBus'em
   \item Ma diodę, która się świeci, jak hat jest wybrany.
   \item Ma pull-upy/downy na komunikacji (i ADDR1), żeby nie była floating jak hat jest odpięty.
   \item Jest w licencji TO-DO. % /#\#/\/#\
-  \item Ma zdjęcie, BOM na GitHubie.
+  \item Ma zdjęcie, BOM i Gerbera na GitHubie.
   \item Ma dokumentację na GitHubie.
-  \item Ma soft na GitHubie.
-  \item Ma tagi hashtag XXX na dole dokumentacji, żeby dało radę go wyszukać. % /#\#/\/#\ zrób
-  \item Wszystkie złączki mają opisany pinout na silkscreenie.
+  \item Ma dodane odpowiednie "Topics" na githubie żeby dało rade go szukać
+  \item Ma zrobione Release z numerem wersji zgodnej z silkscreenem
   \item Nazwa, autor i rewizja hata jest opisana na silkscreenie.
-  \item Duuużo diod, żeby się ładnie świeciło.
-  \item Same złączki też opisane do czego są dużymi literami, żeby było ładnie.
+  % \item Ma soft na GitHubie.
+  % Trzeba wymyślić jak to zrobić więc komentuje
+  \item Wszystkie złączki mają opisany pinout na silkscreenie żebyś podem nie klął na siebie z przeszłości
+  \item Każda funkcjonalność jaka się da ma led'a z nią związaną (Np. jak odpalasz CS odpala się led, jak silnik się kręci jest led)
+  \item Każda rzecz która może mieć ma jakiegoś led'a który jest tylko do pomocy w debugowaniu programisti (Np. expander GPIO, proc na hat'ie). 
+  \item Złączki są opisane do czego są dużymi literami, żeby było ładnie i czytelnie.
+  \item Jak skończysz hat'a to się prześpij. Następnego dnia gwarantuje ci że znajdiesz jeszcze 2 błędy.
+  \item I Jak skończysz hat'a to poobracaj go sobie na widoku 3D i popraw go troche estetycznie. 
 \end{itemize}
 \section{MiniModuCard - Wymagania dla MMS-a}
 \begin{itemize}
-  \item Jakiś proc na nim.
-  \item Złącza XT-60.
-  \item Przetworka VBUS -> 5V 1A.
-  \item Przełączanie ADDR.
-  \item Obsługa protokołów na ChainBus.
-  \item Wymiary, złącza i otwory w dobrych miejscach.
-  \item Przełączanie USB między złączką C a ChainLinkiem.
-  \item USB hub na programator i USB z MCU.
-  \item Obsługa ChainLink.
-  \item 2x CAN.
+  \item Ma wymiary 100x50mm
+  \item Ma 6 otworów montażowych M2.5.
+  \item Nie daje komponentów na keepout zone'ach (zob. sekcja mechaniczna).
+  \item Ma złącza XT-60 męskie + żeńskie.
+  \item Ma przetworke VBUS na co najmniej -> 5V 1A.
+  \item Łączy napięcie na obu zlączch (do daisy chain'owania XT60)
+  \item Ma 2x złącza RJ45 na ChainLink
+  \item Przekazuje CAN'A
+  \item Przekujze USB, chyba że przełącznik do USB jest przełączony
+  \item Jeśli przełącznik usb jest przełaczony to zaświeca diode, zabiera USB z ChainLink'a i daje go na USB hub'a
+  \item ChainLink Upstream i Downstream są opisane wyraźnie na silkscreen'ie
+  \item Przekazuje +12V STB z jednego ChainLink'a na drugi i na ChainBus
+  \item Mikrokontroler MMS3 potrafi obsłużyć 2x CAN FD
+  \item Mikrokontroler da się programować przez USB (a jeśli się nie da to jest debugger na płytce)
+  \item Jak podłączysz się przez USB-C to ma priorytet na USB nad ChainLink'iem
+  \item Miktrokonroler ma RESET na przycisku nad USB
+  \item Jest co najmniej 1 przycisk i 1 dioda do debuggowania
+  \item Jest jedna dioda KOLOR (TBD) z przodu płytki która jest popięta tylko do 3V3 (że płytka jest zasilona)  
+  % /#\#/\/#\  Jaki kolor?
+  \item MCU potrafi przełączać linie ADDR
+  \item MCU obsługuje SPI, I2C i UART które są podłączone przez ChainBus'a
+  \item Wolne piny MCU są wyprowadzone na rząd AltMode
+  \item Autor płytki jest podpisany razem z wersją/rewizją
 \end{itemize}
 \section{MiniModuCard - Projektowanie hatów} \label{MiniModuCard - Projektowanie hatów}
 \subsection{Co musisz zrobić}
@@ -886,7 +905,7 @@ Tak wygląda otworzony w programie KiCad (musisz wejść w widok schematu/płytk
   \item Masz już zrobione złącze ChainBus, adresowanie i resztę
   \item Jedunie musisz dodać układ którego potrzebujesz, pasywki i złącza żeby to do czegoś podłączyć.
   \item Co potrzebujesz dodać na schematic'u, dodaj w środku "User area". Reszty nie dotykaj ale polecam sobie obejrzeć jak to działa.
-  \item Okay, jedyną rzeczą którą możesz ruszyć jest "Power Connector". To jest złącze XT60 i możesz go usunąć ze schematic'a i PCB jeśli go nie potrzebujesz (ono służy do podlączenia więcej zasilania jak musisz mieć więcej prądu na VIN niż chainbus ci da)
+  \item Okay, jedyną rzeczą którą możesz ruszyć poza "User area" jest "Power Connector". To jest złącze XT60 i możesz go usunąć ze schematic'a i PCB jeśli go nie potrzebujesz (ono służy do podlączenia więcej zasilania jak musisz mieć więcej prądu na VIN niż chainbus ci da)
   \item Nie zmieniaj rozmiaru płytki PCB i nie ruszaj rozstawu śrub montażowych oraz złącz ChainBus.
   \item Schematic jest podzielony na hierarchical sheet'y (np. Bus switch. Te prostokąty, możesz na nie dwa razy kliknąć, żeby zobaczyć do środka). Proszę też ich używaj <3
   \item O, i co do hierarchical sheet'ów (schematów hierarchicznych), to możesz zobaczyć, czy na innym hat'ie nie ma jakiegoś, który ci się przyda. Powinny być opisane w README
@@ -1324,7 +1343,7 @@ Both MCU i przetworka są na templatce
 \section{Duży ModuCard - Projektowanie kart} \label{Duży ModuCard - Projektowanie kart}
 Sorka, To be done
 \section{Duży ModuCard - Pinout złączy}
-\subsection{ModuCard - Na backplane'ie}
+\subsection{ModuCard - DIN41612 Na backplane'ie}
 Jest na backplane'ie. Harting 09031967921 Proste, footprint \texttt{DIN41612\_R\_3x32\_Male\_Vertical\_THT}),
 
 \begin{figure}[H]
@@ -1377,7 +1396,7 @@ Jest na backplane'ie. Harting 09031967921 Proste, footprint \texttt{DIN41612\_R\
 \end{table}
 
 
-\subsection{ModuCard - Na karcie}
+\subsection{ModuCard - DIN41612 Na karcie}
 TBA
 
 \section{Pomiędzy systemami - Karta adapter i ChainLink} \label{karta_adapter}
