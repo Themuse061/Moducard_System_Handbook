@@ -1202,7 +1202,7 @@ Dla kompletnego systemu potrzebujesz 1x Karte komputera pokładowego. 1 lub wię
 \subsubsection{Oh, i to może cie też interesować}
 Kiedy którego użyć -> \ref{Kiedy_ktorego_uzyc}
 
-\section{Duży ModuCard - Backplane}
+\section{Duży ModuCard - Backplane} \label{Duży ModuCard - Backplane}
 Szkielet całego ModuCard'a -> do niego wpinasz karty
 
 % /#\#/\/#\ Zdjęcie pliska
@@ -1281,6 +1281,61 @@ Long story short, nie przejmuj się nim
 \section{Duży ModuCard - Projektowanie kart} \label{Duży ModuCard - Projektowanie kart}
 Sorka, To be done
 \section{Duży ModuCard - Pinout złączy}
+\subsection{ModuCard - Na backplane'ie}
+Jest na backplane'ie. Harting 09031967921 Proste, footprint \texttt{DIN41612\_R\_3x32\_Male\_Vertical\_THT}),
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{photos/Footrpint_DIN41612_R_3x32_Male_Vertical_THT.png}
+  \caption{DIN41612 R 3x32 męskie pionowe na backplane'ie}
+  %\label{fig:NoLabel}
+\end{figure}
+
+\begin{table}[H]
+  \centering
+  \caption{Złącze karty, DIN41612 R 3x32}
+  \small
+  \begin{tabular}{@{}cccc@{}}
+    \toprule
+    \textbf{Pin \#} & \textbf{Row A} & \textbf{Row B} & \textbf{Row C} \\ \midrule
+    1  & GND        & Index1     & GND        \\
+    2  & USB D-     & Index2     & USB D+     \\
+    3  & CAN1+      & Strobe1+   & CAN1+      \\
+    4  & CAN1-      & Strobe1-   & CAN1-      \\
+    5  & CAN2+      & Strobe2+   & CAN2+      \\
+    6  & CAN2-      & Strobe2-   & CAN2-      \\
+    7  & GPIO L0    & GND        & GPIO R0    \\
+    8  & GPIO L1    & GND        & GPIO R1    \\
+    9  & GPIO L2    & GND        & GPIO R2    \\
+    10 & GPIO L3    & GND        & GPIO R3    \\
+    11 & GPIO L4    & GND        & GPIO R4    \\
+    12 & GPIO L5    & GND        & GPIO R5    \\
+    13 & GPIO L6    & GND        & GPIO R6    \\
+    14 & GPIO L7    & GND        & GPIO R7    \\
+    15 & GPIO L8    & GND        & GPIO R8    \\
+    16 & GPIO L9    & GND        & GPIO R9    \\
+    17 & GPIO L10   & GND        & GPIO R10   \\
+    18 & GPIO L11   & GND        & GPIO R11   \\
+    19 & GPIO L12   & GND        & GPIO R12   \\
+    20 & GPIO L13   & GND        & GPIO R13   \\
+    21 & GPIO L14   & GND        & GPIO R14   \\
+    22 & GPIO L15   & GND        & GPIO R15   \\
+    23 & GND        & GND        & GND        \\
+    24 & Vbat       & Vbat       & Vbat       \\
+    25 & Vbat       & Vbat       & Vbat       \\
+    26 & Vbat       & Vbat       & Vbat       \\
+    27 & Vbat       & Vbat       & Vbat       \\
+    28 & Vbat       & Vbat       & Vbat       \\
+    29 & Vbat       & Vbat       & Vbat       \\
+    30 & Vbat       & Vbat       & Vbat       \\
+    31 & Vbat       & Vbat       & Vbat       \\
+    32 & GND        & GND        & GND        \\ \bottomrule
+  \end{tabular}
+\end{table}
+
+
+\subsection{ModuCard - Na karcie}
+TBA
 
 \section{Pomiędzy systemami - Karta adapter i ChainLink} \label{karta_adapter}
 \subsection{Karta Adapter}
