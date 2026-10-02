@@ -304,7 +304,7 @@ Jest wymyślony w taki sposób, żeby zminimalizować ilość pracy włożoną w
 
 % /#\#/\/#\ Kijowa nazwa alert: MMS nazywa się tak samo jak MiniModuCard. System i jego cpu
 
-ModuCard i MiniModuCard komunikują się ze sobą dwiema liniami CAN. Taki protokół komunikacyjny wymyślony do samochodów. Jest spoko, bo wiesz, że jak wyślesz jakąś paczkę danych, to na pewno dojdzie do adresata, ma priorytety wiadomości i inne. Te same linie CAN idą przez duży i mały ModuCard.
+ModuCard i MiniModuCard komunikują się ze sobą dwiema liniami CAN. Taki protokół komunikacyjny wymyślony do samochodów. Jest spoko, bo wiesz, że jak wyślesz jakąś paczkę danych, to na pewno dojdzie do adresata, ma priorytety wiadomości i inne. Te same linie CAN idą przez duży i mały ModuCard. 
 
 \subsection{Naprawa i wytrzymałość}
 
@@ -1205,27 +1205,83 @@ Kiedy którego użyć -> \ref{Kiedy_ktorego_uzyc}
 \section{Duży ModuCard - Backplane} \label{Duży ModuCard - Backplane}
 Szkielet całego ModuCard'a -> do niego wpinasz karty
 
-% /#\#/\/#\ Zdjęcie pliska
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1\textwidth]{photos/Backplane_MM3.png}
+  \caption{Backplane}
+  %\label{fig:NoLabel}
+\end{figure}
+
 
 Backplane przekazuje między kartami
 \begin{itemize}
   \item 2x CAN
-  \item 1x USB na karte. podłączone do komputera pokładowego
-  \item 2x Strobe (o nich w \ref{Duży ModuCard - Strobe})
-  \item 16x GPIO (o nich w \ref{Duży ModuCard -  GPIO})
+  \item 1x USB na karte
+  \item 2x index 
+  \item 2x Strobe 
+  \item 16x GPIO 
   \item Zasilanie 48V (ile mocy/karte masz w \ref{Duży ModuCard - Bilans Mocy})
-  \item I troche pinów konfiguracyjnych
 \end{itemize}
 
-USB jest podłączone przez hub'a USB wbudowanego w backplane'a.
+\subsection{CAN}
+To nim idą wszystkie dane. Główny protokół komunikacyjny
+
+\subsection{USB}
+Każda karta jest podłączona przez USB do komputera pokładowego przez hub'a USB zintegrowanego w backplane'ie. Głównie zaplanowany do debuggowania.
+
+\subsection{Index}
+ModuCard dostarcza do każdej karty 2x piny index. Służą one do automatycznej konfiguracji kart i sekwencjonowania zasilania
+
+\subsubsection{Index1}
+Wysterowywany przez backplane'a. Służy do poinformowania kart komputerów czy są komputerem pokładowym
+
+Każda karta ma Index1 jako floating lub pulldown za wyjątkiem karty pierwszej która ma go na 3V3. Na tej podstawie wie że jest komputerem pokładowym i musi sterować całym moducardem.
+
+\subsubsection{Index2}
+Wysterowywany przez komputer pokładowy. Służy do włączenia całego ModuCarda w trakcie sekwencjonowania zasilania.
+
+Jak jest 0V lub floating to karta jest wyłączona, jak 3V3 to karta może się aktywować
+
+I to jest po to, że jak włączasz elektronike i masz zwarcie to masz problem do zdebugoowania. I weź teraz znajdź gdzie jest. Ale fajnie gdyby się samo się znalazło, i troche tak robi. Jak włączasz zasilanie to możesz zrobić to tak
+
+\begin{itemize}
+  \item Podłączasz swojego robota do baterii, 230V czy czegokolwiek
+  \item Zasilacz odpala tylko komputer pokładowy
+  \item Komputer pokładowy się bootuje
+  \item Komputer pozwala reszcie kart się odpalić
+  \item Komputery kart bootują
+  \item Komputer każe kartom odpalić peryferia
+  \item Peryferia bootują
+  \item Karty robią self test
+  \item Komputer pozwala karcie adapter zasilić MMS3
+  \item MMS3 bootuje
+  \item MMS3 robi self test
+\end{itemize}
+
+I jak tak po kolei zasilasz to wiesz w którym momencie coś się zepsuło, np. że któraś karta ma zwarcie jak odpalasz peryferia
+
+\subsection{GPIO}
+Każda karta ma 16 GPIO wyprowadzonych do komunikowania się z kartami obok. Możesz ich używać do
+\begin{itemize}
+  \item Do niczego - Najlepsza opcja, każda karta jest niezależna i może ją wpiąć gdzie chcesz i się nie martwić o nic. Jeśli możesz to tak zrób
+  \item Jeśli jakoś absolutnie brakuje ci miejsca na PCB i nie możesz tego rozbić na niezależne karty, to możesz podzielić to co robisz na dwie karty które komunikują się czy to cyfrowo czy analogowo czy jakieś interrupty przez GPIO L/R. Jak możesz to zrób dwie niezależne karty, i dopiero jak się tak nie da to zrób z komunikacją przez GPIO.
+  \item Jest 16 GPIO, i wiesz co ma też 16 GPIO? Chainbus. Możesz zrobić system MMS na dużym ModuCard'ie. Ale no, lepiej robić niezależne karty
+  \item Tak na prawde miedź to miedź, więc możesz na nich cokolwiek puścić. Use your own judgment and creativity
+\end{itemize}
+
+Long story short, nie przejmuj się nimi i najlepiej zostaw w spokoju
+\subsection{Strobe}
+Strobe to para różnicowa do timingu. Gdybyś potrzebował dokładnie zsynchronizować jakieś wydarzenie na hat'ach to możesz wysłać na to trigger. Nigdzie tego jeszcze nie potrzebowaliśmy, jest jako futureproofing.
+
+(I to są tak na prawde GPIO które idą przez wszystkie karty. Miedź to miedź and Use your own judgment and creativity)
+
+Long story short, nie przejmuj się nimi i najlepiej zostaw w spokoju
+
+\subsection{I reszta}
 
 Na całego backplane'a możesz dać tylko jeden komputer pokładowy, musi być w slot'ie pierwszym.
 
 Backplane'y można łączyć ze sobą żeby je przedłużyć. Np. dwa backplane'y 6x można połączyć w jednego 12x. Oh i pamiętaj że komputer pokładowy musi być w slot'ie pierwszym pierwszego backplane'a
-
-Co do pinów konfiguracyjnych, to don't worry about them (:
-
-% /#\#/\/#\ Jak będziemy mieli piny konfiguracyjne to je opisze (;
 
 \section{Duży ModuCard - Typy Kart}
 \subsection{Karta Gateway (Komputer pokładowy)}
@@ -1257,21 +1313,8 @@ No i tyle. cała sztuka. To jest basic bitch embedded system, tylko na standardo
 
 No i ofc potrzebujesz przetworki 48V -> 5V or whatever floats your boat.
 
+Both MCU i przetworka są na templatce
 
-\section{Do czego używać GPIO L/R} \label{Duży ModuCard -  GPIO}
-Każda karta ma 16 GPIO wyprowadzonych do komunikowania się z kartami obok. Możesz ich używać do
-\begin{itemize}
-  \item Do niczego - Najlepsza opcja, każda karta jest niezależna i może ją wpiąć gdzie chcesz i się nie martwić o nic. Jeśli możesz to tak zrób
-  \item Jeśli jakoś absolutnie brakuje ci miejsca na PCB i nie możesz tego rozbić na niezależne karty, to możesz podzielić to co robisz na dwie karty które komunikują się czy to cyfrowo czy analogowo czy jakieś interrupty przez GPIO L/R. Jak możesz to zrób dwie niezależne karty, i dopiero jak się tak nie da to zrób z komunikacją przez GPIO.
-  \item Jest 16 GPIO, i wiesz co ma też 16 GPIO? Chainbus. Możesz zrobić system MMS na dużym ModuCard'ie. Ale no, lepiej robić niezależne karty
-  \item Tak na prawde miedź to miedź, więc możesz na nich cokolwiek puścić. Use your own judgment and creativity
-\end{itemize}
-
-Long story short, nie przejmuj się nim
-\section{Co to strobe} \label{Duży ModuCard - Strobe}
-Strobe to para różnicowa do timingu. Gdybyś potrzebował dokładnie zsynchronizować jakieś wydarzenie na hat'ach to możesz wysłać na to trigger. Nigdzie tego jeszcze nie potrzebowaliśmy, jest jako futureproofing.
-
-Long story short, nie przejmuj się nim
 \section{Duży ModuCard - Przykładowe Karty}
 \section{Duży ModuCard - Bilans Mocy}\label{Duży ModuCard - Bilans Mocy}
 \section{Duży ModuCard - Wymagania dla Kart użytkowych}
