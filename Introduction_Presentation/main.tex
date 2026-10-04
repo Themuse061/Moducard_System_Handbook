@@ -17,7 +17,7 @@
   \leavevmode%
   \hbox{%
     \hspace{10pt}%
-    \begin{beamercolorbox}[wd=\paperwidth,ht=2.5ex,dp=1.125ex]{page number in head/foot}%
+    \begin{beamercolorbox}[wd=\dimexpr\paperwidth-10pt\relax,ht=2.5ex,dp=1.125ex]{page number in head/foot}%
       \usebeamerfont{page number in head/foot}\insertframenumber%
     \end{beamercolorbox}%
   }%
@@ -134,9 +134,9 @@
 
 \tekstLP{Dlaczego go używamy}{Modularność}{
     \item Łatwo coś wymienić, jak się zepsuje
+    \item Wszystko da się wymienić między projektami
     \item Każda płytka jest prosta i tania
     \item Można organicznie rozwijać projekt
-    \item Wszystko da się wymienić między projektami
 }{Inserting_cards_diagram.png}
 
 %=============== Gdzie go używamy ===============
@@ -150,7 +150,7 @@
 %=============== Duży ModuCard ===============
 \sekcja{Duży ModuCard}
 
-\tekstGD{O co z nim chodzi}{Duży ModuCard to backplane + karty}{
+\tekstGD{O co z nim chodzi}{Duży ModuCard to Backplane + Karty}{
     \item Mózg całego systemu
     \item Przetwarzanie i analiza danych
     \item Podzespoły za duże na Mini ModuCard'a
@@ -168,19 +168,19 @@
 \zdjecie{Backplane z kartami}{ModuCard-rack.png}{}
 
 \tekstGD{Jak karty się komunikują}{Karty połączone są przez backplane'a}{
-    \item CAN
-    \item USB
-    \item GPIO
-    \item STROBE
+    \item CAN - główna komunikacja
+    \item USB - debugging
+    \item GPIO - special
+    \item STROBE - special
 }{Backplane_MM3.png}
 
 %=============== Mały ModuCard ===============
 \sekcja{Mały ModuCard}
 
-\tekstGD{O co z nim chodzi}{Mały ModuCard to MMS3 + hat'y}{
-    \item Zajmuje się prostymi funkcjami
+\tekstGD{O co z nim chodzi}{Mały ModuCard to MMS3 + Hat'y}{
+    \item Ręce i oczy całego systemu
     \item Współpracuje z dużym ModuCard'em
-    \item Lorem ipsum
+    \item Dobry początek nauki elektroniki
 }{example-image}
 
 \zdjecie{MMS3}{MMS3_solo.jpg}{}
@@ -191,7 +191,7 @@
     \item I2C
     \item SPI
     \item UART
-    \item HAT SELECT
+    \item HAT SELEMiniCT
 }{MMS3_hat_selecting_diagram.png}
 
 %=============== Łączenie systemów ===============
@@ -245,10 +245,10 @@
 \begin{frame}{Dokumentacja}
     \begin{columns}[c]
         \begin{column}{0.6\textwidth}
-            \begin{block}{Dokumentacja jest WIP}
+            \begin{block}{Główną dokumentacją jest Handbook}
                 \begin{itemize}
-                    \item PDF opisujący całą elektronikę
-                    \item Stara, dokładniejsza prezentacja
+                    \item To PDF opisujący całą elektronikę
+                    \item Jest też stara, dokładniejsza prezentacja
                     \item Pracujemy nad stroną internetową
                 \end{itemize}
             \end{block}
@@ -267,7 +267,7 @@
     \end{columns}
 \end{frame}
 
-\zdjecie{Link do dokumentacji}{Documentation_QR_Code.png}{Kod QR do dokumentacji na GitHubie}
+\zdjecie{Link do dokumentacji}{Documentation_QR_Code.png}{}
 
 %=============== Slajdy dodatkowe ===============
 \sekcja{Slajdy dodatkowe -- zdjęcia}
