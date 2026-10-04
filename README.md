@@ -4,6 +4,11 @@ Jeśli będą rzeczy w różnych językach, pomieszane, powtórzone itd to sorka
 Potrzeba żeby ktoś napisał jak to działa faktycznie, zrobił zdjęcia
 a potem się to rzuci do chata "popraw to. make no mistake"
 
+# Zawartość Repo
+## Handbook - Główna dokumentacja. Kompletny opis systemu
+## Introduction_presentation - Krótka prezentacja do zarysowania ogólnego kształtu systemu
+## Stara_prezentacja - Dłuższa prezentacja w której jest opisana większość działania systemu. Zachowana głównie w celach archiwalnych, lepiej patrze do Handbook'a
+
 
 # Moducard_System_Handbook
 Repo with source files for Moducard System Handbook

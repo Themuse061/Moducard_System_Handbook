@@ -27,11 +27,74 @@
 \setbeamerfont{page number in head/foot}{size=\Large}
 \setbeamertemplate{navigation symbols}{}
 
+%=============== Typy slajdów ===============
+% Pomocnicze: blok z czerwonym nagłówkiem albo same punkty, gdy nagłówek pusty
+% \punktyblok{czerwony tekst}{\item ... \item ...}
+\newcommand{\punktyblok}[2]{%
+  \if\relax\detokenize{#1}\relax
+    \begin{itemize}#2\end{itemize}%
+  \else
+    \begin{block}{#1}\begin{itemize}#2\end{itemize}\end{block}%
+  \fi
+}
+
+% Sekcja - jedno duże słowo na środku
+% \sekcja{nazwa}
+\newcommand{\sekcja}[1]{%
+  \section{#1}
+  \begin{frame}
+    \vfill
+    \begin{center}
+      {\fontsize{36}{42}\selectfont\color{PWRred}\textbf{#1}}
+    \end{center}
+    \vfill
+  \end{frame}
+}
+
+% Zdjęcie - duże zdjęcie z (opcjonalnym) podpisem
+% \zdjecie[opcje includegraphics]{tytuł}{plik}{podpis}
+\newcommand{\zdjecie}[4][]{%
+  \begin{frame}{#2}
+    \begin{figure}
+      \centering
+      \includegraphics[#1,width=\linewidth,height=0.75\textheight,keepaspectratio]{#3}
+      \if\relax\detokenize{#4}\relax\else\caption{#4}\fi
+    \end{figure}
+  \end{frame}
+}
+
+% Tekst/zdjęcie LP - po lewej tekst, po prawej zdjęcie
+% \tekstLP[opcje includegraphics]{tytuł}{czerwony tekst}{\item ...}{plik}
+\newcommand{\tekstLP}[5][]{%
+  \begin{frame}{#2}
+    \begin{columns}[c]
+      \begin{column}{0.5\textwidth}
+        \punktyblok{#3}{#4}
+      \end{column}
+      \begin{column}{0.45\textwidth}
+        \centering
+        \includegraphics[#1,width=\linewidth,height=0.7\textheight,keepaspectratio]{#5}
+      \end{column}
+    \end{columns}
+  \end{frame}
+}
+
+% Tekst/zdjęcie GD - na górze tekst, na dole zdjęcie
+% \tekstGD{tytuł}{czerwony tekst}{\item ...}{plik}
+\newcommand{\tekstGD}[4]{%
+  \begin{frame}{#1}
+    \punktyblok{#2}{#3}
+    \vfill
+    \begin{center}
+      \includegraphics[width=\linewidth,height=0.5\textheight,keepaspectratio]{#4}
+    \end{center}
+    \vfill
+  \end{frame}
+}
+
 %=============== Dane Tytułowe ===============
-\title[]{Tytuł prezentacji}
-\author[Koło Naukowe]{\textbf{} \\
-    Autor 1 \\
-    Autor 2}
+\title[]{ModuCard -- tym razem na serio od podstaw}
+\author[Koło Naukowe]{Wojciech Szafrański}
 \date{\today}
 
 \begin{document}
@@ -44,74 +107,205 @@
 % --- Plan prezentacji ---
 \begin{frame}{Plan prezentacji}
     \begin{enumerate}
-        \item \textbf{Część 1} – opis
-        \item \textbf{Część 2} – opis
-        \item \textbf{Część 3} – opis
+        \item Wstęp
+        \item Gdzie go używamy
+        \item Duży ModuCard
+        \item Mały ModuCard
+        \item Łączenie systemów
+        \item Programowanie
+        \item Mechanika
+        \item Dokumentacja
+        \item Koniec
+        \item Slajdy bonusowe
     \end{enumerate}
 \end{frame}
 
-\section{Część 1}
+% TODO: wszystkie example-image to placeholdery do podmiany na właściwe zdjęcia
 
-% --- Blok + zdjęcie ---
-\begin{frame}{Slajd z blokiem i zdjęciem}
-    \begin{block}{Nagłówek bloku}
-        Treść bloku.
-    \end{block}
-    \begin{figure}
-        \centering
-        \includegraphics[width=0.6\linewidth]{example-image}
-        \caption{Podpis zdjęcia}
-    \end{figure}
-\end{frame}
+%=============== Wstęp ===============
+\sekcja{Wstęp}
 
-% --- Dwie kolumny ---
-\begin{frame}{Slajd z dwiema kolumnami}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \textbf{Lewa kolumna}
-            \begin{itemize}
-                \item Punkt 1
-                \item Punkt 2
-            \end{itemize}
+\tekstLP[angle=-90,origin=c]{Co to jest ModuCard}{Lego do projektów}{
+    \item System standardów do składania projektów
+    \item Duży i Mały ModuCard
+    \item Ekstremalna modularność
+    \item Prostota nauki
+}{Syf_piwnica_z_plytkami_MMS.jpg}
+
+\tekstLP{Dlaczego go używamy}{Modularność}{
+    \item Łatwo coś wymienić, jak się zepsuje
+    \item Każda płytka jest prosta i tania
+    \item Można organicznie rozwijać projekt
+    \item Wszystko da się wymienić między projektami
+}{Inserting_cards_diagram.png}
+
+%=============== Gdzie go używamy ===============
+\sekcja{Gdzie go używamy}
+
+\zdjecie{Nomad}{Nomad2.png}{}
+\zdjecie{Hefajstos}{example-image}{}
+\zdjecie[angle=-90,origin=c]{Zlecenie do metrologa}{Zlecenie_do_metrologa.jpg}{}
+\zdjecie{Betcon}{example-image}{}
+
+%=============== Duży ModuCard ===============
+\sekcja{Duży ModuCard}
+
+\tekstGD{O co z nim chodzi}{Duży ModuCard to backplane + karty}{
+    \item Mózg całego systemu
+    \item Przetwarzanie i analiza danych
+    \item Podzespoły za duże na Mini ModuCard'a
+}{example-image}
+
+\zdjecie{Backplane}{Backplane_solo.jpg}{}
+\zdjecie{Karty w ModuCard'ie}{MM_Karta_Solo.jpg}{}
+
+%=============== Rodzaje kart ===============
+\sekcja{Rodzaje kart}
+
+\zdjecie{Karta komputer pokładowy}{Dominik-sbc.png}{}
+\zdjecie{Karta zasilacz}{Card Power supply.jpg}{}
+\zdjecie{Karta użytkowa}{Moducard nav module.png}{}
+\zdjecie{Backplane z kartami}{ModuCard-rack.png}{}
+
+\tekstGD{Jak karty się komunikują}{Karty połączone są przez backplane'a}{
+    \item CAN
+    \item USB
+    \item GPIO
+    \item STROBE
+}{Backplane_MM3.png}
+
+%=============== Mały ModuCard ===============
+\sekcja{Mały ModuCard}
+
+\tekstGD{O co z nim chodzi}{Mały ModuCard to MMS3 + hat'y}{
+    \item Zajmuje się prostymi funkcjami
+    \item Współpracuje z dużym ModuCard'em
+    \item Lorem ipsum
+}{example-image}
+
+\zdjecie{MMS3}{MMS3_solo.jpg}{}
+\zdjecie{Hat}{MMS3_Hat_Solo.png}{}
+\zdjecie{MMS3 + hat'y}{MMS3_Full_stack.jpg}{}
+
+\tekstGD{Jak MMS3 steruje hat'ami}{Hat'y są podłączone ChainBus'em}{
+    \item I2C
+    \item SPI
+    \item UART
+    \item HAT SELECT
+}{MMS3_hat_selecting_diagram.png}
+
+%=============== Łączenie systemów ===============
+\sekcja{Łączenie systemów}
+
+\tekstGD{Jak połączyć duży ModuCard z małym}{Przez kartę adapter}{
+    \item Obydwa komunikują się po protokole CAN i USB
+    \item Wystarczy je do siebie podpiąć kablem RJ45
+}{ModucardMMSlink.png}
+
+\zdjecie{Karta adapter wpięta w backplane}{Card interface no background.png}{}
+\zdjecie{Kilka MMS3 można połączyć jeden za drugim}{example-image}{}
+
+\zdjecie{Minimalny pełny system}{ModuCard-mini.png}{}
+
+%=============== Programowanie ===============
+\sekcja{Programowanie}
+
+\tekstGD{Hardware}{Programowanie jest plug-and-play}{
+    \item Każda płytka ma na sobie programator
+    \item Wystarczy się podpiąć po USB-C
+    \item Można zdalnie programować z komputera pokładowego
+}{USB - Stealy Wheely.png}
+
+\tekstLP{Mały ModuCard}{Używamy Zephyra}{
+    \item Lorem ipsum
+    \item Hat'y programujemy jako biblioteki, które da się kopiować między projektami
+    \item Lorem ipsum
+}{Zephyr_logo.png}
+
+\tekstLP{Duży ModuCard}{Lorem ipsum}{
+    \item Lorem ipsum
+    \item Lorem ipsum
+    \item Lorem ipsum
+}{example-image}
+
+%=============== Mechanika ===============
+\sekcja{Mechanika}
+
+\zdjecie{Mocowanie ModuCarda -- rack Eurocard}{example-image}{}
+\zdjecie{Mocowanie MiniModuCarda -- szyna DIN}{example-image}{}
+
+\tekstGD{Wymiary}{Skąd wziąć wymiary}{
+    \item Wymiary są opisane w handbooku
+    \item Ale najlepiej poproś elektronika, żeby ci wyeksportował .step
+}{Eksportowanie_wymiarow_kicad.png}
+
+%=============== Zakończenie ===============
+\sekcja{Zakończenie}
+
+\begin{frame}{Dokumentacja}
+    \begin{columns}[c]
+        \begin{column}{0.6\textwidth}
+            \begin{block}{Dokumentacja jest WIP}
+                \begin{itemize}
+                    \item PDF opisujący całą elektronikę
+                    \item Stara, dokładniejsza prezentacja
+                    \item Pracujemy nad stroną internetową
+                \end{itemize}
+            \end{block}
+            \begin{block}{Jak masz pytania, to pisz do mnie}
+                \begin{itemize}
+                    \item Jestem: Wojtek Szafrański
+                    \item Discord: @themuse061
+                    \item WhatsApp: +48 796 313 524
+                \end{itemize}
+            \end{block}
         \end{column}
-        \begin{column}{0.48\textwidth}
-            \textbf{Prawa kolumna}
-            \includegraphics[width=\linewidth]{example-image}
+        \begin{column}{0.35\textwidth}
+            \centering
+            \includegraphics[width=\linewidth,height=0.75\textheight,keepaspectratio]{ModuCard-Handbook.png}
         \end{column}
     \end{columns}
 \end{frame}
 
-% --- Tabela ---
-\begin{frame}{Slajd z tabelą}
-    \begin{table}
-        \centering
-        \begin{tabular}{lll}
-            \toprule
-            Kolumna 1 & Kolumna 2 & Kolumna 3 \\
-            \midrule
-            a & b & c \\
-            d & e & f \\
-            \bottomrule
-        \end{tabular}
-        \caption{Podpis tabeli}
-    \end{table}
-\end{frame}
+\zdjecie{Link do dokumentacji}{Documentation_QR_Code.png}{Kod QR do dokumentacji na GitHubie}
 
-\section{Podsumowanie}
+%=============== Slajdy dodatkowe ===============
+\sekcja{Slajdy dodatkowe -- zdjęcia}
 
-\begin{frame}{Podsumowanie}
-    \begin{block}{Omówione zagadnienia}
-        \begin{itemize}
-            \item Punkt 1
-            \item Punkt 2
-        \end{itemize}
-    \end{block}
-\end{frame}
+\zdjecie{Przykładowa karta -- nav module}{Moducard nav module.png}{}
+\zdjecie{Przykładowa karta -- komputer pokładowy CM5}{Dominik-sbc.png}{}
+\zdjecie{Przykładowa karta -- komputer pokładowy Orange Pi 5}{RPI-baord.png}{}
+\zdjecie{Przykładowa karta -- Arduino z shieldem relay}{Moducard arduino.png}{}
+\zdjecie{Przykładowy MMS3 -- STM32F405}{MMS3.png}{}
+\zdjecie{Przykładowy hat -- hat protocol}{hat protocol.png}{}
+\zdjecie{Przykładowy hat -- hat relay}{hat relay.png}{}
+\zdjecie{Przykładowy hat -- hat stepper}{hat stepper.png}{}
+\zdjecie{Przykładowy hat -- hat thermocouple}{hat thermocouple.png}{}
 
-\begin{frame}{Dziękuję za uwagę}
-    \begin{center}
-        \Huge \textbf{Pytania?}
-    \end{center}
-\end{frame}
+\sekcja{Slajdy dodatkowe -- protokoły}
+
+\tekstLP{Backplane}{Co przez niego idzie}{
+    \item 2$\times$ CAN
+    \item 1$\times$ USB na kartę
+    \item 2$\times$ index
+    \item 2$\times$ STROBE
+    \item 16$\times$ GPIO
+    \item Zasilanie 48\,V
+}{backpane_protocol_example.png}
+
+\tekstLP{ChainLink}{Co przez niego idzie}{
+    \item 2$\times$ CAN
+    \item 1$\times$ USB
+    \item 12\,V
+}{ChainLink_Example.png}
+
+\tekstLP{ChainBus}{Co przez niego idzie}{
+    \item SPI
+    \item I2C
+    \item UART
+    \item HAT SELECT
+    \item Zasilanie 5\,V
+    \item Zasilanie od 12\,V do 48\,V
+}{Chainus_example.png}
 
 \end{document}
