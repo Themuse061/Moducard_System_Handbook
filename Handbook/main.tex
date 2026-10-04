@@ -1302,7 +1302,7 @@ Na całego backplane'a możesz dać tylko jeden komputer pokładowy, musi być w
 
 Backplane'y można łączyć ze sobą żeby je przedłużyć. Np. dwa backplane'y 6x można połączyć w jednego 12x. Oh i pamiętaj że komputer pokładowy musi być w slot'ie pierwszym pierwszego backplane'a
 
-\section{Duży ModuCard - Typy Kart}
+\section{Duży ModuCard - Typy Kart} \label{Duży Moducard - Typy Kart}
 \subsection{Karta Gateway (Komputer pokładowy)}
 Pierwsza i najważniejsza karta w systemie. To ona steruje wszystkim.
 
@@ -1312,7 +1312,7 @@ Możesz go zaprogramować jako
 
 1. Komputer pokładowy - no, komputer pokładowy. Niezależna jednostka która steruje całym robotem.
 
-2. Gateway - Jeśli potrzebujesz mega dużo mocy obliczeniowej to zamiast robić jakiś porąbanie mocny komputer pokładowy i przetważać te dane w robocie, to wysyłasz dane po np. Ethernecie poza robota, tam to przetważasz i odsyłasz spowrotem do robota. Wtedy karta komputera pokładowego robi jako gateway do innego, większego komputera
+2. Gateway - Jeśli potrzebujesz mega dużo mocy obliczeniowej to zamiast robić jakiś porąbanie mocny komputer pokładowy i przetważać te dane w robocie, to wysyłasz dane po np. Ethernecie poza robota, tam to przetważasz i odsyłasz spowrotem do robota. Wtedy karta komputera pokładowego robi jako gateway do innego, większego komputera
 
 Wymiennie będę nazywał tą karte jako komputer pokładowy i gateway.
 
@@ -1499,15 +1499,15 @@ Potrzebujesz przeczytać XXX i XXX i to chociaż rozumieć ogólnie. Opisze to j
 
 Wyobraź sobie że chcesz zrobić Lego City. Gdybyś robił je z luźnej garści klocków to muisz zaprojektować domek A żeby pasował z domkiem B, domek B z C, C z D itd. Każdy domek jest unikatowy i pasuje tylko w swoje miejsce. I problem: każdy domek trzeba projektować od nowa.
 
-ModuCard rozwiązuje ten problem - każdy domek ma taką samą działke, więc jak chcesz złożyć "blok 10 pięter" albo "domek jednorodzinny" to wiesz że będzie pasował i wiesz jak duży musi być. Dodatkowo jak zbudujesz jeden blok, to możesz go dać w 10 innych dzielnicach.
+ModuCard rozwiązuje ten problem - każdy domek ma taką samą, standardową działke, więc jak chcesz złożyć "blok mieszkalny" albo "domek jednorodzinny" to wiesz że będzie pasował do miejsca w którym ma być.
 
-Dodatkowo możesz łatwo kolaborować z innymi, mówisz im tylko "weź mi zrób blok 30x30 klocków" i wiesz że będzie pasować.
+Dodatkowo jak zbudujesz jeden blok, to możesz go dać w 10 innych dzielnicach. W końcu każdy pasuje do standardowej działki.
 
-Dodatkowo ktoś już zrobił gotowe zestawy klocków i je przetestował, więc ty tylko zamawiasz, montujesz i masz gotowy domek.
+Dalej, możesz łatwo kolaborować z innymi, mówisz im tylko "weź mi zrób restauracje do mojego miasta" i wiesz że będzie pasować.
+
+I jeszcze, często robisz jakiś standardowy budynek typu właśnie dom czy blok który ktoś już zrobił kiedyś. Możesz zobaczyć jak on go zrobił, zamówić jego zestaw klocków i go zbudować. On już włożył prace żeby zrobić zestaw, przetestować go i opisać, więc ty tylko zamawiasz, montujesz i masz gotowy domek.
 
 I tak działa ModuCard, wszystkie płytki mają standardowe wymiary, standardowe komponenty i standardowe protokoły komunikacyjne. Dzięki temu uzyskujemy te zalety klocków lego łatwość przenoszenia, powielania, szybkie wdrażanie do systemu.
-
-Jedna płytka robi jedną czynność (np. steruje silnikami) więc jak masz silniki w projekcie to używasz ModuCard-płytka-silniki. Jak masz 4 silniki to dajesz 4 płytki ModuCard-płytka-silniki. 
 
 Dla elektronika masz gotowe template'y do zaczęcia projektowania płytek, pare ścian dokumentacji jak to działa które możesz mu dać do przeczytania (albo streszczenia przez AI) i liste kroków na githubie jak ładnie napisać dokumentacje.
 
@@ -1516,19 +1516,74 @@ Programista ma gotowe zalążki kodu które musi tylko uzupełnić. I wszystko j
 A mechanik, mechanik da sobie rade.
 % /#\#/\/#\ 
 
-\subsection{Jak podzielony jest moducard }
-Robisz karty i hat'y, reszta jest gotowa. Ukradnij gotowe rzeczy z git'a
 
-\subsection{Jak składać projekt}
-Co jest jakim klockiem lego (hat to silnik, duży moducard to komunikacja, przetważanie danych i telemetria. może powazne rzeczy na nim też)
-Jeden MMS3 kilka hatów, Jeden backplane kilka kart
+\subsection{Jak podzielony jest moducard}
+ModuCard jest podzielony na mały i duży. Mały zajmuje się zbieraniem danych i sterowaniem efektorami (silnikami) a Duży przetwarza te dane i wydaje polecenia.
 
-\subsection{Jak planować projekt}
+W dużym ModuCardzie robisz Karty wpinane do backplane'A. Na kartach są faktyczne rzeczy a backplane je tylko łączy. 
+
+W małym Moducardzie masz płytke z procesorem i Hat'y. Płytka z procesorem (MMS3 CPU) komunikuje się z dużym ModuCard'em i steruje hat'ami. Na hat'ach są czujniki i sterowniki silników.
+
+\section{Jak składać projekt}
+
+Zanim zaczniesz skladać projekt, to wiedz że wszystkie trudne płytki już zrobiliśmy, bo:
+
+\subsection{Co już jest zrobione}
+\subsubsection{Duży ModuCard to}
+
+\begin{itemize}
+  \item Backplane'a
+  \item Karte zasilacz
+  \item Karte komputera pokładowego
+  \item Karty użytkowe
+  \item Karta adapter
+\end{itemize}
+
+Backplane, zasilacz, komputer i adapter są już gotowe. Jedyne co musisz zrobić/znaleźć to karty użytkowe.
+
+\subsubsection{Mały ModuCard to}
+
+\begin{itemize}
+  \item MMS3 CPU
+  \item hat'y
+\end{itemize}
+
+MMS3 jest już zrobiony. Jedyne co musisz zrobić/znaleźć to hat'y
+
+
+\subsection{Gdzie tego szukać}
+ToDo, napisz do mnie to wbije bo teraz nie mam internetu jak to pisze ):
+%  /#\#/\/#\  
+
+\subsection{Czyli w skrócie}
+ToDo
+%  /#\#/\/#\  
+\begin{itemize}
+  \item Na początku musisz wiedzieć co potrzebujesz. Wypisz sobie to gdzieś, np. 2x silnik krokowy, 5x taśmy led, 20x przycisków, 1x kamera itd.
+  \item Potem sprawdź czy ktoś już tego nie zrobił. Sprawdź na stronie i tagach na GitHub'ie. 
+  \item Jak nikt tego nie zrobił, to daj ogrniętemu elektronikowi sprawdzić to co teraz zrobiłeś, bo może coś przeoczyłeś
+  \item Jak nie ma, to daj task'a elektronikowi zróbić karte lub hat'a z tą funkcjonalnością
+\end{itemize}
+ 
+\subsection{Minimalny pełny system}
+Tu masz przykladowe rzeczy które potrzebujesz do systemu jak nie chcesz szukać. Jak to weźmiesz to brakuje ci tylko kart użytkowych i hat'ów
+ToDo!
+%  /#\#/\/#\  
+\begin{itemize}
+  \item Backplane -
+  \item Karta komputer -
+  \item Karta zasilacz -
+  \item Karta adapter - 
+  \item MMS3 -
+\end{itemize}
+
+\section{Jak planować projekt}
 Podziel dużą elektronike na podsystemy, daj pojednycze hat'y elektroniką. Możesz na bierząco dokładać nowe rzeczy
+ToDo
 
-\subsection{Jak składać projekt}
+\section{Jak składać projekt}
 Gotowe hat'y dajesz osobno programistą do zrobienia bibliotek. Potem składasz kilka hatów na MMS3 i go programujesz. On gada do komputera pokładowego, który nadzorue cały system. to samo dla Kart napisz
-
+ToDo
 
 \chapter{Książka ecosystem maintainer}
 
@@ -1542,7 +1597,25 @@ Okay, jako że to jest mój fork to sobie zapisze notatki co do rozwoju systemu
   \item programowanie musi być proste, KISS it or nobody will use it
   \item Trzeba porządnie usiąść do licencji prawnych. Hat'y mają jakieś, ale to temp solutions
   \item Czy da rade zrobić interrupty na ChainBus? Pomysł jest taki: ADDRX pullup i hat może go sam pulnąć w dół jak coś się dzieje - zły pomysł
+  \item Dobry pomysł: Używasz open drain interruptów ale przez rezystor. Na MMS3 MCU jest układ który mierzy prąd ADDR. Jak płynie to znaczy że jest IT i daje go do MCU. Pomysł Artem'a
+  \item Są dwa wolne piny na chainbusie, taki fun fact
 \end{itemize}
+
+I notatki co trzeba dopisać
+\begin{itemize}
+  \item Dopisać sekcje o robieniu kart
+  \item Przenieść rzeczy ogólnie o robieniu PCB do swojej sekcji linkowanej z robienia kart i hatów
+  \item Linkować tą dokumentacje z templatki hat'ów
+  \item I przenieść checkliste hatów i kart do tej książki
+  \item Powiedz o tagach na git hub'ie
+  \item I stronie internetowej
+  \item Cała sekcja mechaniczna
+  \item Do system integrator, plug and play minimalny system z linkami
+\end{itemize}
+
+Dopisz do elektronika
+
+Jedna płytka robi jedną czynność (np. steruje silnikami) więc jak masz silniki w projekcie to używasz ModuCard-płytka-silniki. Jak masz 4 silniki to dajesz 4 płytki ModuCard-płytka-silniki. 
 
 
 \end{document}
