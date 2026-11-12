@@ -13,19 +13,26 @@
 
 %=============== Ustawienia szablonu ===============
 \usetheme[horizontal=true, hr=false]{NewPwr}
+% Numer slajdu wyśrodkowany w czerwonym kwadracie (25pt x 25pt w lewym dolnym rogu tła)
 \setbeamertemplate{footline}{%
   \leavevmode%
-  \hbox{%
-    \hspace{10pt}%
-    \begin{beamercolorbox}[wd=\dimexpr\paperwidth-10pt\relax,ht=2.5ex,dp=1.125ex]{page number in head/foot}%
-      \usebeamerfont{page number in head/foot}\insertframenumber%
-    \end{beamercolorbox}%
-  }%
-  \vskip10pt%
+  \hbox to 25pt{\hss%
+    \vbox to 25pt{\vss%
+      \hbox{\usebeamerfont{page number in head/foot}\usebeamercolor[fg]{page number in head/foot}%
+        \raisebox{0pt}[\fontcharht\font`0][0pt]{\insertframenumber}}%
+    \vss}%
+  \hss}%
 }
 \setbeamercolor{page number in head/foot}{fg=white}
 \setbeamerfont{page number in head/foot}{size=\Large}
 \setbeamertemplate{navigation symbols}{}
+
+% Powiększone czcionki na slajdzie tytułowym
+\setbeamerfont{title}{size=\fontsize{28}{34}\selectfont,series=\bfseries}
+\setbeamerfont{subtitle}{size=\LARGE}
+\setbeamerfont{author}{size=\Large}
+\setbeamerfont{institute}{size=\large}
+\setbeamerfont{date}{size=\large}
 
 %=============== Typy slajdów ===============
 % Pomocnicze: blok z czerwonym nagłówkiem albo same punkty, gdy nagłówek pusty
@@ -73,7 +80,7 @@
       \end{column}
       \begin{column}{0.45\textwidth}
         \centering
-        \includegraphics[#1,width=\linewidth,height=0.7\textheight,keepaspectratio]{#5}
+        \includegraphics[width=\linewidth,height=0.7\textheight,keepaspectratio,#1]{#5}
       \end{column}
     \end{columns}
   \end{frame}
@@ -93,7 +100,7 @@
 }
 
 %=============== Dane Tytułowe ===============
-\title[]{ModuCard -- tym razem na serio od podstaw}
+\title[]{Wprowadzenie do systemu ModuCard}
 \author[Koło Naukowe]{Wojciech Szafrański}
 \date{\today}
 
@@ -112,29 +119,29 @@
         \item Duży ModuCard
         \item Mały ModuCard
         \item Łączenie systemów
+        \item Projektowanie
         \item Programowanie
         \item Mechanika
         \item Dokumentacja
         \item Koniec
-        \item Slajdy bonusowe
     \end{enumerate}
 \end{frame}
 
 % TODO: wszystkie example-image to placeholdery do podmiany na właściwe zdjęcia
 
 %=============== Wstęp ===============
-\sekcja{Wstęp}
+%\sekcja{Wstęp}
 
-\tekstLP[angle=-90,origin=c]{Co to jest ModuCard}{Lego do projektów}{
+\tekstLP[height=0.9\textheight]{Co to jest ModuCard}{Lego do projektów}{
     \item System standardów do składania projektów
-    \item Duży i Mały ModuCard
+    \item Duży i mały ModuCard
     \item Ekstremalna modularność
-    \item Prostota nauki
-}{Syf_piwnica_z_plytkami_MMS.jpg}
+    \item Niski poziom wejścia projektowania
+}{Moducard_and_the_boys.jpg}
 
 \tekstGD{Dlaczego go używamy}{Modularność}{
     \item Łatwo coś wymienić, jak się zepsuje
-    \item Wszystko da się wymienić między projektami
+    \item Gotowe rozwiązania da się przenosić między projektami
     \item Każda płytka jest prosta i tania
     \item Można organicznie rozwijać projekt
 }{Inserting_cards_diagram.png}
@@ -150,96 +157,148 @@
 %=============== Duży ModuCard ===============
 \sekcja{Duży ModuCard}
 
-\tekstGD{O co z nim chodzi}{Duży ModuCard to Backplane + Karty}{
+\tekstGD{Czym jest duży ModuCard}{Duży ModuCard to backplane + karty}{
     \item Mózg całego systemu
     \item Przetwarzanie i analiza danych
-    \item Podzespoły za duże na małego ModuCard'a
-}{ModuCard_nomad.jpg}
+    \item Podzespoły za duże na małego ModuCarda
+}{ModuCard.jpg}
 
 \zdjecie{Backplane}{Backplane_solo.jpg}{}
-\zdjecie{Karty w ModuCard'ie}{MM_Karta_Solo.jpg}{}
+\zdjecie{Karty}{MM_Cards.jpg}{}
 
 %=============== Rodzaje kart ===============
 \sekcja{Rodzaje kart}
 
-\zdjecie{Karta komputer pokładowy}{Dominik-sbc.png}{}
+\zdjecie{Karta komputer pokładowy, np. Raspberry Pi CM5}{Dominik-sbc.png}{}
 \zdjecie{Karta zasilacz}{Card Power supply.jpg}{}
-\zdjecie{Karta użytkowa}{Moducard nav module.png}{}
+\zdjecie{Karta użytkowa, np. Navigation Card}{Moducard nav module.png}{}
 \zdjecie{Backplane z kartami}{ModuCard-rack.png}{}
 
-\tekstGD{Jak karty się komunikują}{Karty połączone są przez backplane'a}{
-    \item CAN - główna komunikacja
-    \item USB - debugging
-    \item GPIO - special
-    \item STROBE - special
+\tekstGD{Jak karty się komunikują}{Karty połączone są przez backplane}{
+    \item CAN -- główna komunikacja
+    \item USB -- debugging
+    \item STROBE -- synchronizacja
+    \item GPIO -- reszta
 }{Backplane_MM3.png}
+
+\tekstLP[trim=190 90 195 75,clip]{CAN}{Główna magistrala systemu}{
+    \item Odporny na zakłócenia -- sygnał różnicowy
+    \item Pewny przesył, błędne przesyłu są automatycznie wykrywane
+    \item Standard w motoryzacji, robotyce i automatyce przemysłowej
+    \item Łatwa integracja z ROS2
+}{CANBUS.jpg}
 
 %=============== Mały ModuCard ===============
 \sekcja{Mały ModuCard}
 
-\tekstGD{O co z nim chodzi}{Mały ModuCard to MMS3 + Hat'y}{
-    \item Ręce i oczy całego systemu
-    \item Współpracuje z dużym ModuCard'em
-    \item Dobry początek nauki elektroniki
-}{MMS_syf.jpg}
+\tekstGD{Czym jest mały ModuCard}{Mały ModuCard to płytka sterująca MMS3 + Haty}{
+    \item Ręce i oczy całego systemu -- silniki i czujniki
+    \item Współpracuje z dużym ModuCardem
+    \item Ale też może pracować niezależnie
+}{MiniModuCard.jpg}
 
-\zdjecie{MMS3}{MMS3_solo.jpg}{}
-\zdjecie{Hat}{MMS3_Hat_Solo.png}{}
-\zdjecie{MMS3 + hat'y}{MMS3_Full_stack.jpg}{}
+\zdjecie{MMS3 -- kontroler systemu}{MMS3_solo.jpg}{}
+\zdjecie{Hat -- moduł wykonawczy}{MMS3_Hat_Solo.jpg}{}
+\zdjecie{MMS3 + Haty}{MMS3_Full_stack.jpg}{}
+\zdjecie{2x MMS3 + Haty}{2xMMS3.jpg}{}
 
-\tekstGD{Jak MMS3 steruje hat'ami}{Hat'y są podłączone ChainBus'em}{
+\tekstGD{Jak MMS3 steruje Hatami}{Haty są podłączone ChainBusem}{
     \item I2C
     \item SPI
     \item UART
-    \item HAT SELECT
+    \item HAT SELECT -- Multiplexowanie komunikacji
 }{MMS3_hat_selecting_diagram.png}
+
+\tekstGD{SPI, I2C, UART}{Najpopularniejsze protokoły do rozmowy z układami scalonymi}{
+    \item Standardowe sposoby, w jakie mikrokontroler rozmawia z układami scalonymi -- czujnikami, sterownikami, pamięciami
+    \item Prawie każdy układ obsługuje któryś z nich, więc pasuje do Hata
+    \item Każdy Hat ma swoją pule adresów I2C i CS dla SPI
+}{SPI_I2C_UART.png}
 
 %=============== Łączenie systemów ===============
 \sekcja{Łączenie systemów}
 
 \tekstGD{Jak połączyć duży ModuCard z małym}{Przez kartę adapter}{
-    \item Obydwa komunikują się po protokole CAN i USB
+    \item Obydwa komunikują się przez CAN i USB
     \item Wystarczy je do siebie podpiąć kablem RJ45
 }{ModucardMMSlink.png}
 
-\zdjecie{Karta adapter wpięta w backplane}{Card interface no background.png}{}
-\zdjecie{Kilka MMS3 można połączyć jeden za drugim}{connecting.jpg}{}
+\zdjecie{Duży ModuCard połączony z małym}{Adapter+MMS3.jpg}{}
+\zdjecie{MMS3 można połączyć jeden za drugim}{MMS3_Daisy_chain.jpg}{}
+
+% Skopiowane ze starej prezentacji (slajdy 35--36)
+\begin{frame}{Mały ModuCard -- stopnie integracji}
+    \begin{block}{Stopień 1: MMS3 z kilkoma Hatami}
+        Domyślny stopień -- jeden MMS3 steruje kilkoma Hatami podłączonymi do niego.
+        Umożliwia łatwe dodawanie i usuwanie Hatów oraz nowych funkcjonalności.
+    \end{block}
+    \begin{block}{Stopień 2: MMS3 z Hatem AltMode}
+        Połączenie układów z kilku Hatów w jeden Hat AltMode. System jest mniejszy,
+        ale już nie modularny (MMS3 jest kompatybilny z Betaflight i VESC).
+    \end{block}
+    \begin{block}{Stopień 3: pojedyncza płytka}
+        Połączenie mikrokontrolera i Hata AltMode na tym samym PCB.
+    \end{block}
+\end{frame}
+
 
 \zdjecie{Minimalny pełny system}{ModuCard-mini.png}{}
+
+
+\sekcja{Projektowanie}
+
+\tekstGD{Jak zaprojektować Hata}{Zaczynasz od gotowego szablonu w KiCadzie}{
+    \item Szablon ma już obrys płytki, otwory montażowe, ChainBus i zasilanie
+    \item Dodajesz tylko swoją funkcję -- często jeden układ scalony
+    \item Instalacja programów i poradniki są opisane w Handbook'u 
+}{MMS3_hat_template_pcb.png}
+
+
 
 %=============== Programowanie ===============
 \sekcja{Programowanie}
 
-\tekstGD{Hardware}{Programowanie jest plug-and-play}{
+\tekstGD{Podłączenie się do mikrokontrolera}{Programowanie jest plug-and-play}{
     \item Każda płytka ma na sobie programator
     \item Wystarczy się podpiąć po USB-C
     \item Można zdalnie programować z komputera pokładowego
 }{USB - Stealy Wheely.png}
 
 \tekstLP{Mały ModuCard}{Używamy Zephyra}{
-    \item Lorem ipsum
-    \item Hat'y programujemy jako biblioteki, które da się kopiować między projektami
-    \item Lorem ipsum
+    \item Haty jako biblioteki -- kopiujesz między projektami
+    \item Ten sam kod na STM32, ESP32, nRF etc.
+    \item Zephyr to RTOS rozwijany przez Linux Foundation, używany w przemyśle
 }{Zephyr_logo.png}
 
-\tekstLP{Duży ModuCard}{Lorem ipsum}{
-    \item Lorem ipsum
-    \item Lorem ipsum
-    \item Lorem ipsum
+\tekstLP{Duży ModuCard}{Używamy STMEPIC}{
+    \item Autorski framework programistyczny
+    \item Nakładka na HAL – mniej powtarzalnego kodu
+    \item Automatyczny generator ramek CAN
 }{STM_epic.png}
 
 %=============== Mechanika ===============
 \sekcja{Mechanika}
 
-\zdjecie{Mocowanie dużego ModuCarda -- rack Eurocard}{example-image}{}
-\zdjecie{Mocowanie małego ModuCarda -- szyna DIN}{example-image}{}
+\zdjecie{Mocowanie dużego ModuCarda -- rack Eurocard}{Eurorack_wikipedia.jpg}{}
+\zdjecie{Mocowanie małego ModuCarda -- szyna DIN}{Din_rail_mount.jpg}{}
 
-\tekstGD{Wymiary}{Skąd wziąć wymiary}{
-    \item Wymiary są opisane w handbooku
-    \item Ale najlepiej poproś elektronika, żeby ci wyeksportował .step
-}{Eksportowanie_wymiarow_kicad.png}
+%\tekstGD{Wymiary}{Skąd wziąć wymiary}{
+%    \item Wymiary są opisane w handbooku
+%    \item Ale najlepiej poproś elektronika, żeby ci wyeksportował .step
+%}{Eksportowanie_wymiarow_kicad.png}
 
 %=============== Zakończenie ===============
+
+
+\tekstLP{Dlaczego ModuCard}{Co zyskujemy}{
+    \item Łatwe projektowanie -- gotowe szablony
+    \item Organiczny rozrost -- dokładasz moduły w trakcie
+    \item Łatwy upgrade procesora
+    \item Proste i tanie płytki
+    \item Łatwy debug i programowanie -- jednym kablem
+    \item Open source
+}{6+1_boards.jpg}
+
 \sekcja{Zakończenie}
 
 \begin{frame}{Dokumentacja}
@@ -248,7 +307,7 @@
             \begin{block}{Główną dokumentacją jest Handbook}
                 \begin{itemize}
                     \item To PDF opisujący całą elektronikę
-                    \item Jest też stara, dokładniejsza prezentacja
+                    \item Jest stara, techniczna prezentacja
                     \item Pracujemy nad stroną internetową
                 \end{itemize}
             \end{block}
@@ -267,20 +326,16 @@
     \end{columns}
 \end{frame}
 
-\zdjecie{Link do dokumentacji}{Documentation_QR_Code.png}{}
+\begin{frame}
+    \vfill
+    \begin{center}
+      {\fontsize{40}{40}\selectfont\color{PWRred}\textbf{Pytania?}}\\[1.5em]
+      \includegraphics[height=0.8\textheight]{Documentation_QR_Code.png}
+    \end{center}
+    \vfill
+\end{frame}
 
 %=============== Slajdy dodatkowe ===============
-\sekcja{Slajdy dodatkowe -- zdjęcia}
-
-\zdjecie{Przykładowa karta -- nav module}{Moducard nav module.png}{}
-\zdjecie{Przykładowa karta -- komputer pokładowy CM5}{Dominik-sbc.png}{}
-\zdjecie{Przykładowa karta -- komputer pokładowy Orange Pi 5}{RPI-baord.png}{}
-\zdjecie{Przykładowa karta -- Arduino z shieldem relay}{Moducard arduino.png}{}
-\zdjecie{Przykładowy MMS3 -- STM32F405}{MMS3.png}{}
-\zdjecie{Przykładowy hat -- hat protocol}{hat protocol.png}{}
-\zdjecie{Przykładowy hat -- hat relay}{hat relay.png}{}
-\zdjecie{Przykładowy hat -- hat stepper}{hat stepper.png}{}
-\zdjecie{Przykładowy hat -- hat thermocouple}{hat thermocouple.png}{}
 
 \sekcja{Slajdy dodatkowe -- protokoły}
 
@@ -307,5 +362,28 @@
     \item Zasilanie 5\,V
     \item Zasilanie od 12\,V do 48\,V
 }{Chainus_example.png}
+
+\sekcja{Slajdy dodatkowe -- zdjęcia}
+
+\zdjecie{Przykładowa karta -- nav module}{Moducard nav module.png}{}
+\zdjecie{Przykładowa karta -- komputer pokładowy CM5}{Dominik-sbc.png}{}
+\zdjecie{Przykładowa karta -- komputer pokładowy Orange Pi 5}{RPI-baord.png}{}
+\zdjecie{Przykładowa karta -- Arduino z shieldem relay}{Moducard arduino.png}{}
+\zdjecie{Przykładowy MMS3 -- STM32F405}{MMS3.png}{}
+\zdjecie{Przykładowy Hat -- Hat protocol}{hat protocol.png}{}
+\zdjecie{Przykładowy Hat -- Hat relay}{hat relay.png}{}
+\zdjecie{Przykładowy Hat -- Hat stepper}{hat stepper.png}{}
+\zdjecie{Przykładowy Hat -- Hat thermocouple}{hat thermocouple.png}{}
+
+
+\begin{frame}{Źródła}
+    \begin{enumerate}
+        \item  https://www.motionandmechatronics.ca/features/guide-to-controller-area/ -- Logo CAN
+        \item   https://en.wikipedia.org/wiki/Eurorack -- Eurorack
+        \item https://www.raypcb.com/din-rail-mount-pcb/ -- szyna DIN
+        \item https://personales.upv.es/ancebfer/EMBEB/slides/T5.html -- SPI I2C UART
+    \end{enumerate}
+\end{frame}
+
 
 \end{document}
