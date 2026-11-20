@@ -1003,12 +1003,17 @@ Oh, i nawet jak nie kupujesz komponentów od JLC/LCSC to I tak pobierz od nich s
 \subsubsection{Spoko filmy/źródła o projektowaniu schematic'ów/PCB}
 \begin{itemize}
   \item \url{https://www.youtube.com/@PhilsLab} <- Absolutny GOAT
+  \item I to  jest lista jego filmów \url{https://gist.github.com/JonyBepary/ed7419fec1ed115fd9aed64be34afde5}
   \item \url{https://blog.poly.nomial.co.uk/2025-08-10-creating-high-quality-electronics-schematics.html}
   \item GreatScott na yt -> tłumaczy od podstaw w prosty sposób
   \item Sam Ben-yaakov na YT
   \item Electrarc240 na YT
   \item Biblia elektroniki - "The Art of Electronics" Paul Horowitz and Winfield Hill. Pewnie nie jej szukasz ale podobno jest mega dobra 
-  \item \url{https://www.youtube.com/playlist?list=PLEBQazB0HUyQ5YJSdCBb79orXaR3Uk5vm} - Poradnik Digikey do KiCad'a. Nie jest idealny, ale spoko jak nigdy go nie otwierałeś jeszcze.
+  \item I pare playlist KiCad od zera
+  \item \url{https://www.youtube.com/playlist?list=PLEBQazB0HUyQ5YJSdCBb79orXaR3Uk5vm}
+  \item \url{https://www.youtube.com/watch?v=vaCVh2SAZY4&list=PLEBQazB0HUyR24ckSZ5u05TZHV9khgA1O}
+  \item A tu już troche bardziej zaawnsowanie, ale wciąż podstawy
+  \item https://www.youtube.com/watch?v=O-zNn5k5Bn4
 \end{itemize}
 
 \subsubsection{I już rzeczy bardziej tangential related, ogólnie do elektroniki a nie do projektowania hatów}
@@ -1019,10 +1024,10 @@ Oh, i nawet jak nie kupujesz komponentów od JLC/LCSC to I tak pobierz od nich s
   \item nie ściśle związene z elektroniką, ale spoko artykuł \url{https://www.catb.org/~esr/faqs/smart-questions.html}
 \end{itemize}
 
-\subsubsection{I jeszcze pare kanałów do oglądania dla zajawki,}
+\subsubsection{I jeszcze pare kanałów do oglądania dla zajawki}
 \begin{itemize}
-  \item \url{https://www.youtube.com/@CNLohr}
   \item \url{https://www.youtube.com/@bitluni}
+  \item \url{https://www.youtube.com/@CNLohr}
   \item \url{https://www.youtube.com/@BenEater}
   \item \url{https://www.youtube.com/@StuffMadeHere}
   \item \url{https://www.youtube.com/@styropyro}
@@ -1469,10 +1474,91 @@ Mały task - mały moducard. Duży task - moducard nie musi być duży, ale tak 
 % Mały rysunek, mała wiedza. Duży rysunek - więdza może i nie jest duża, ale przynajmniej jest czytelnie - Jacek Świniarski, mój ulubiony zawodowiec z technikum
 
 \chapter{Książka programisty}
-\section{Wstęp}
-Aktualnie nie mamy nic zaprogramowane. Powodzenia!
+\section{Słowem wstępu}
+Okay, kinda nie moja działka ale i tak moge napisać. Jak nic nie ogarniasz lub tylko podstawy to polecam te poradniki do 
 
-Update: Chyba używamy Zephyr'a
+Embedded, czyli programowanie procy i niski poziom:
+\begin{itemize}
+  \item HAL, punkt wyjścia 
+  \item \url{https://www.youtube.com/watch?v=hyZS2p1tW-g}
+  \item Już wyżej, RTOS czyli systemy czasu rzeczywistego i multitasking
+  \item \url{https://www.youtube.com/watch?v=F321087yYy4&list=PLEBQazB0HUyQ4hAPU1cJED6t3DU0h34bz}
+\end{itemize}
+
+ROS, czyli High Level
+\begin{itemize}
+  \item \url{https://www.youtube.com/playlist?list=PLEBQazB0HUySWueUF2zNyrA8LSX3rDvE7&si=6DrZGLOW5invra53}
+  \item \url{https://www.youtube.com/@ArticulatedRobotics/videos}
+\end{itemize}
+
+\section{MiniModuCard}
+\subsection{Wstęp i linki}
+Programujemy w Zephyr'e 
+\url{https://www.youtube.com/watch?v=mTJ_vKlMS_4}
+
+Chodzi w nim o to że wasz hardware jest zabstracjonowany od was, i można łatwo zmieniać mikrokontrolery i hat'y. Dzięki temu można przenosić kod między projektami łatwiej + drivery do układów scalonych są pisane zwykle przez producentów więc też powinny być gotowe.
+
+O, i jak go ogarniacie to już faktycznie spoko prace możecie znaleźć bo to standard w przemyśle
+
+Mamy już pare rzeczy zrobionych i linków do zobaczenia, w tym
+\begin{itemize}
+  \item manifest zephyr'a
+  \item \url{https://github.com/maxksiazka/zephyr-manifest}
+  \item repozytorium zephyr'A
+  \item \url{https://github.com/zephyrproject-rtos/zephyr}
+  \item  Definicje board'ów
+  \item \url{https://github.com/KoNaR-Hefajstos/mms_board_definitions}
+  \item Driver hat'ów
+  \item \url{https://github.com/KoNaR-Hefajstos/mms_hat_driver}
+  \item Driver ChainBus'a
+  \item \url{https://github.com/KoNaR-Hefajstos/mms_chainbus_driver}
+  \item Blink'a
+  \item \url{https://github.com/maxksiazka/mms_blink}
+  \item Cały przykładowy projekt, kruszarke
+  \item \url{https://github.com/KoNaR-Hefajstos/MMS3_panel_kruszarka}
+\end{itemize}
+
+
+Większość tego zrobił Max Książka, i do niego możecie pisać o pomoc/wdrożenie.
+
+\subsection{Hat ID EEPROM}
+Każdy hat ma na sobie programowalną pamięć EEPROM. Idea z nią jest taka, że można wgrać na nią dane identyfikacjyne (np. do trackowania która płytka gdzie jest, kto ją zlutował etc i do dynamicznego rozpoznawania hat'ów czyli nie zależne w jakiej kolejności je wepniesz to i tak wiadomo który jest gdzie) albo konfiguracyjne (np. współczynniki kalibracyjne)
+
+Teraz, trzeba zrobić standard do mapy pamięci EEPROM'a, żeby każdy hat miał taką samą. Moja propozycja to
+
+\begin{itemize}
+  \item Rewizja mapy - Żeby było wiedzieć jak odczytać dane jeśli byśmy zrobiili rewizje danych
+  \item UUID hat'a - 128 bitów żeby było zgodne z generatorami uuid
+  \item Nazwa hata - 128 bitów i też generujesz losowo tylko masz w bazie danych jaki hat ma jakie bity
+  \item wersja software'u - jeśli hat ma na sobie jakiegoś proca z wgrywalnym kodem to jaka to jest wersja kodu
+  \item rewizja hardwareu - to samo, albo można ją wbić połączyć z nazwą hat'a
+  \item pointer do początku wolnych danych w eepromie - żeby nie trzeba było liczyć
+\end{itemize}
+
+UUID - unikalny numer tej konkretnej plytki
+nazwa hat'a - np. hat GPIO, hat protocol
+
+Poza tymi danymi na EEPROM'ie można trzymać cokolwiek. Miejsce na to jest za pointerm do początku wolnych danych
+
+Żeby to się łatwo programowało, na start można
+\begin{enumerate}
+  \item Nie używać tego, lol
+  \item Sprawdzać, a jak zły hat jest wpięty albo ma starą rewizje mapy to wywalić errora "user attention needed"
+  \item ALbo to porządnie zaimplementować
+\end{enumerate}
+Na razie to nie jest wazne, tylko fajnie było by mape ustalić
+
+
+\section{Duży ModuCard}
+\subsection{Wstęp i linki}
+
+Programujemy w STMEpic, naszym customowym framework'u do STM32 zrobionym przez Patryka Dudzińskiego. Głównie to abstrakcja hardware'u od was i automatyczny generoator ramek CAN'a.
+
+
+\url{https://stmepic.d3lab.dev/md_docs_pages_geting_started.html}
+
+Jak macie pytania albo potrzebujecie pomocy/szkolenia to piszcie do Damiana Radosa
+
 \chapter{Książka mechaniczna}
 \section{Gotowe rozwiązania}
 Siemka, jak nie chce ci się projektować, to możesz zakosić jeden z tych sposobów na który już mocowaliśmy ModuCard'a
